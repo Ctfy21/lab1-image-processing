@@ -3,8 +3,9 @@
     <v-app-bar-title>lab1-image-processing</v-app-bar-title>
   </v-app-bar>
 
+
   <v-container width="600px">
-    <v-form @submit.prevent="submit">
+    <v-form @submit.prevent="submitImgUrl">
       <v-file-input label="Image download" variant="underlined" @change="uploadImage"></v-file-input>
       <p class="text-center">OR</p>
       <v-text-field v-model="imgUrl" label="Image URL"></v-text-field>
@@ -13,20 +14,28 @@
   </v-container>
 
   <v-container class="d-flex justify-center">
-    <canvas id="imgCanvas"></canvas>
+      <canvas id="imgCanvas"></canvas>
   </v-container>
 
-  <v-container class="d-flex justify-space-between">
-    <h1 class="h1 text-center">RGB value</h1>
-    <h1 class="h1 text-center">Image size</h1>
-    <h1 class="h1 text-center">Coordinates</h1>
-  </v-container>
+  <v-row class="mt-8">
+    <v-col>
+      <v-row class="d-flex justify-space-between">
+        <v-col><h1 class="h1 text-center">RGB value</h1></v-col>
+        <v-col><h1 class="h1 text-center">Image size</h1></v-col>
+        <v-col><h1 class="h1 text-center">Coordinates</h1></v-col>
+      </v-row>
 
-  <v-container class="d-flex justify-space-between">
-    <h1 class="h1 text-center">{{ rgbText }}</h1>
-    <h1 class="h1 text-center">{{ imgSize }}</h1>
-    <h1 class="h1 text-center">{{ coordText }}</h1>
-  </v-container>
+      <v-row class="d-flex justify-space-between">
+        <v-col><h1 class="h1 text-center">{{ rgbText }}</h1></v-col>
+        <v-col><h1 class="h1 text-center">{{ imgSize }}</h1></v-col>
+        <v-col><h1 class="h1 text-center">{{ coordText }}</h1></v-col>
+      </v-row>
+    </v-col>
+    <v-col>
+      <v-select label="Масштаб" v-model="imgScaleSelect" :items=itemsScaleSelect @update:model-value="rescaleImage"></v-select>
+    </v-col>
+  </v-row>
+
 
 </template>
 
@@ -34,70 +43,69 @@
 export default{
   data() {
     return{
+      image: null,
+      canvas: null,
+      ctx: null,
       imgUrl: "",
-      file: null,
       coordText: "",
       rgbText: "",
-      imgSize: ""
+      imgSize: "",
+      imgScaleSelect: "",
+      itemsScaleSelect: ['12%', '25%', '35%', '50%', '100%', '150%', '200%', '300%']
     }
   },
+  mounted() {
+    this.canvas = document.getElementById("imgCanvas")
+    this.ctx = this.canvas.getContext('2d')
+    this.canvas.width = window.innerWidth - 150
+    this.canvas.height = window.innerHeight - 150
+  },
   methods: {
-    uploadImage(e){
-      var canvas = document.getElementById("imgCanvas")
-      const ctx = canvas.getContext('2d')
-
-      const img = new Image()
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        canvas.width = img.width
-        canvas.height = img.height
-        ctx.drawImage(img, 0, 0);
-        this.imgSize = `${img.width}x${img.height}`
+    initial(src){
+      this.image = new Image()
+      this.image.crossOrigin = 'anonymous';
+      this.image.onload = () => {
+        let scale = Math.min(this.canvas.width / this.image.width, this.canvas.height / this.image.height);
+        let x = (this.canvas.width - this.image.width * scale) / 2;
+        let y = (this.canvas.height - this.image.height * scale) / 2;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Очистка холста
+        this.ctx.drawImage(this.image, x, y, this.image.width * scale, this.image.height * scale);
+        this.imgSize = `${this.image.width}x${this.image.height}`
+        this.imgScaleSelect = String(Math.round(scale * 100)) + '%'
       }
 
-      img.src = URL.createObjectURL(e.target.files[0]);
+      this.image.src = src
 
-      canvas.addEventListener("mousemove", (e) => {
-          const ctx = canvas.getContext('2d')
-          // not so sure about these... might need to offset them or so
-          let rect = canvas.getBoundingClientRect();
+      this.canvas.addEventListener("mousemove", (e) => {
+          let rect = this.canvas.getBoundingClientRect();
           var x = Math.round(e.x - rect.left);
           var y = Math.round(e.y - rect.top);
-          // set color now
-          var canvasColor = ctx.getImageData(x, y, 1, 1).data; // rgba e [0,255]
+          var canvasColor = this.ctx.getImageData(x, y, 1, 1).data;
           var r = canvasColor[0];
           var g = canvasColor[1];
           var b = canvasColor[2];
           this.coordText = `(${x}, ${y})`
           this.rgbText = `(${r},${g},${b})`
         });
-
     },
-    submit() {
-      var canvas = document.getElementById("imgCanvas")
-      const ctx = canvas.getContext('2d')
+    uploadImage(e){
+      this.initial(URL.createObjectURL(e.target.files[0]))
+    },
+    submitImgUrl() {
+      this.initial(this.imgUrl)
+    },
+    rescaleImage(){
+      let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
+      let x = (this.canvas.width - this.image.width * scale) / 2;
+      let y = (this.canvas.height - this.image.height * scale) / 2;
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.drawImage(this.image, x, y, this.image.width * scale, this.image.height * scale);
 
-      const img = new Image()
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        canvas.width = img.width
-        canvas.height = img.height
-        ctx.drawImage(img, 0, 0);
-        this.imgSize = `${img.width}x${img.height}`
-      }
-
-      img.src = this.imgUrl
-
-
-
-      canvas.addEventListener("mousemove", (e) => {
-          const ctx = canvas.getContext('2d')
-          // not so sure about these... might need to offset them or so
-          let rect = canvas.getBoundingClientRect();
+      this.canvas.addEventListener("mousemove", (e) => {
+          let rect = this.canvas.getBoundingClientRect();
           var x = Math.round(e.x - rect.left);
           var y = Math.round(e.y - rect.top);
-          // set color now
-          var canvasColor = ctx.getImageData(x, y, 1, 1).data; // rgba e [0,255]
+          var canvasColor = this.ctx.getImageData(x, y, 1, 1).data;
           var r = canvasColor[0];
           var g = canvasColor[1];
           var b = canvasColor[2];
@@ -105,9 +113,6 @@ export default{
           this.rgbText = `(${r},${g},${b})`
         });
     }
-
-    
-    
   }
 }
 
