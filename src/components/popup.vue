@@ -9,28 +9,38 @@
         ></v-btn>
     </template>
 
-    <template v-slot:default="{ isActive }">
+    <template v-slot:default>
         <v-card title="Change resolution">
             <v-row class="pl-4 pr-4 pt-4">
                     <v-col align="center" justify="center">Before</v-col>
                     <v-col align="center" justify="center">After</v-col>
             </v-row>
             <v-row class="pl-4 pr-4">
-                    <v-col align="center" justify="center">1920x1080</v-col>
-                    <v-col align="center" justify="center">2560x1440</v-col>
+                    <v-col align="center" justify="center">{{ imgSize[0] + "x" + imgSize[1] }}</v-col>
+                    <v-col align="center" justify="center"><p v-if="imgHeight != null && imgWidth != null" >{{ imgWidth + "x" + imgHeight }}</p></v-col>
             </v-row>
             <v-row class="pt-4 pl-8 pr-8">
-                <v-select label="Scale factor" :items="scaleFactorList" item-title="title"></v-select>
+                <v-select label="Scale factor" :items="scaleFactorList" v-model="scaleFactor" item-title="title" item-value="value"></v-select>
             </v-row>
-            <v-row class="pl-5 pr-5">
-                <v-col><v-text-field label="Width"></v-text-field></v-col>
-                <v-col><v-text-field label="Height" :disabled="isProportional"></v-text-field></v-col>
-            </v-row>
-            <v-row class="pl-5 pr-5">
-                <v-checkbox label="Make proportional" v-model="isProportional"></v-checkbox>
-            </v-row>
-
-            <v-row class="pl-5 pr-5">
+            <v-container class="mx-0 px-0" v-if="scaleFactor == 0">
+                <v-row class="pl-5 pr-5">
+                    <v-col><v-text-field id="imgWidthId" v-model="imgWidth" @input="propMeasure" label="Width in pixels"></v-text-field></v-col>
+                    <v-col><v-text-field v-model="imgHeight" label="Height in pixels" :disabled="isProportional"></v-text-field></v-col>
+                </v-row>
+                <v-row class="pl-5 pr-5 mt-0">
+                    <v-checkbox label="Make proportional" v-model="isProportional"></v-checkbox>
+                </v-row>
+            </v-container>
+            <v-container class="mx-0 px-0" v-if="scaleFactor == 1">
+                <v-row class="pl-5 pr-5">
+                    <v-col><v-text-field id="imgWidthId" v-model="imgWidthPercents" @input="percentsEventActivator" label="Width in %"></v-text-field></v-col>
+                    <v-col><v-text-field v-model="imgHeightPercents" label="Height in %" @input="percentsToPixels" :disabled="isProportional"></v-text-field></v-col>
+                </v-row>
+                <v-row class="pl-5 pr-5 mt-0">
+                    <v-checkbox label="Make proportional" v-model="isProportional"></v-checkbox>
+                </v-row>
+            </v-container>
+            <v-row class="pl-8 pr-8">
                 <v-select label="Type of interpolation alghoritm" :items="interpolAlgList" item-title="title">
                     <template v-slot:item="{ props, item }">
                         <v-list-item v-bind="props">
@@ -70,22 +80,32 @@
 </template>
 <script>
 export default{
+    props: {
+        imgSize: Array
+    },
     data(){
         return{
             beforeSize: [],
             afterSize: [],
+            imgWidth: null,
+            imgHeight: null,
+            imgWidthPercents: null,
+            imgHeightPercents: null,
             dialog: null,
+            scale: 0,
             isProportional: false,
+            scaleFactor: null,
             scaleFactorList: [
                 {
-                    title: 'Percentages',
+                    title: 'Pixels',
                     value: 0
                 },
                 {
-                    title: 'Pixels',
+                    title: 'Percentages',
                     value: 1
-                }
+                },
             ],
+            interpolAlg: null,
             interpolAlgList: [
                 {
                     title: 'Nearest neighbor',
@@ -95,9 +115,32 @@ export default{
         }
     },
     methods:{
+        measureScale(){
+            const max = Math.max(this.imgSize[0], this.imgSize[1])
+            const min = Math.min(this.imgSize[0], this.imgSize[1])
+            this.imgSize[0] > this.imgSize[1] ? this.scale = min / max : this.scale = max / min
+        },
         submitResolution(){
             this.dialog = false
-            console.log("Work")
+        },
+        propMeasure(){
+            if(this.isProportional == true){
+                this.measureScale()
+                this.imgHeight = Math.round(this.imgWidth * this.scale)
+            }
+        },
+        percentsEventActivator(){
+            this.propMeasurePercents()
+            this.percentsToPixels()
+        },
+        propMeasurePercents(){
+            if(this.isProportional == true){
+                this.imgHeightPercents = this.imgWidthPercents
+            }
+        },
+        percentsToPixels(){
+            this.imgWidth = Math.round(this.imgSize[0] * (this.imgWidthPercents / 100))
+            this.imgHeight = Math.round(this.imgSize[1] * (this.imgHeightPercents / 100))
         }
     }
 }

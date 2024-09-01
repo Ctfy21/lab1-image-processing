@@ -36,7 +36,7 @@
           <v-select label="Масштаб" v-model="imgScaleSelect" :items=itemsScaleSelect @update:model-value="rescaleImage"></v-select>
         </v-col>
         <v-col>
-          <Popup/>
+          <Popup v-if="image != null" :scale="imageProportional" :imgSize="imgSize.split('x')"/>
         </v-col>
     </v-col>
   </v-row>
@@ -46,6 +46,10 @@
 <script>
 import Popup from '../components/popup.vue';
 export default{
+  props: {
+    scale: Number,
+    imgSize: Array
+  },
   components: { Popup },
   data() {
     return{
@@ -57,6 +61,7 @@ export default{
       rgbText: "",
       imgSize: "",
       imgScaleSelect: "",
+      imageProportional: 0,
       itemsScaleSelect: ['12%', '25%', '35%', '50%', '100%', '150%', '200%', '300%'],
     }
   },
@@ -81,9 +86,9 @@ export default{
     initProp(scale){
         const max = Math.max(this.image.width * scale, this.image.height * scale)
         const min = Math.min(this.image.width * scale, this.image.height * scale)
-        const prop = max / min
+        this.imageProportional = max / min
         if(window.innerWidth >= this.image.width * scale && window.innerHeight >= this.image.height * scale){
-          if(this.image.width * scale >= this.image.height * scale){
+          if(this.image.width >= this.image.height){
             this.canvas.width = this.image.width * scale
             this.canvas.height = this.image.height * scale
           }
@@ -94,12 +99,12 @@ export default{
         }
         else{
           if(window.innerWidth >= window.innerHeight){
-            this.canvas.width = window.innerHeight * prop - 150
+            this.canvas.width = window.innerHeight * this.imageProportional - 150
             this.canvas.height = window.innerHeight - 150
           }
           else{
             this.canvas.width = window.innerWidth - 150
-            this.canvas.height = window.innerWidth * prop - 150
+            this.canvas.height = window.innerWidth * this.imageProportional - 150
           }
         }
     },
