@@ -16,7 +16,7 @@
                     <v-col align="center" justify="center">After</v-col>
             </v-row>
             <v-row class="pl-4 pr-4">
-                    <v-col align="center" justify="center">{{ imgSize[0] + "x" + imgSize[1] }}</v-col>
+                    <v-col align="center" justify="center">{{ imgSizeToDialog[0] + "x" + imgSizeToDialog[1] }}</v-col>
                     <v-col align="center" justify="center"><p v-if="imgHeight != null && imgWidth != null" >{{ imgWidth + "x" + imgHeight }}</p></v-col>
             </v-row>
             <v-row class="pt-4 pl-8 pr-8">
@@ -81,7 +81,8 @@
 <script>
 export default{
     props: {
-        imgSize: Array
+        imgSizeToDialog: Array,
+        imageToDialog: HTMLElement
     },
     data(){
         return{
@@ -116,11 +117,12 @@ export default{
     },
     methods:{
         measureScale(){
-            const max = Math.max(this.imgSize[0], this.imgSize[1])
-            const min = Math.min(this.imgSize[0], this.imgSize[1])
-            this.imgSize[0] > this.imgSize[1] ? this.scale = min / max : this.scale = max / min
+            const max = Math.max(this.imgSizeToDialog[0], this.imgSizeToDialog[1])
+            const min = Math.min(this.imgSizeToDialog[0], this.imgSizeToDialog[1])
+            this.imgSizeToDialog[0] > this.imgSizeToDialog[1] ? this.scale = min / max : this.scale = max / min
         },
         submitResolution(){
+            this.$emit('submitResolution', this.imgSizeToDialog[0], this.imgWidth, this.imgSizeToDialog[1], this.imgHeight)
             this.dialog = false
         },
         propMeasure(){
@@ -139,8 +141,8 @@ export default{
             }
         },
         percentsToPixels(){
-            this.imgWidth = Math.round(this.imgSize[0] * (this.imgWidthPercents / 100))
-            this.imgHeight = Math.round(this.imgSize[1] * (this.imgHeightPercents / 100))
+            this.imgWidth = Math.round(this.imgSizeToDialog[0] * (this.imgWidthPercents / 100))
+            this.imgHeight = Math.round(this.imgSizeToDialog[1] * (this.imgHeightPercents / 100))
         }
     }
 }

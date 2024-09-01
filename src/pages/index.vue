@@ -36,7 +36,10 @@
           <v-select label="Масштаб" v-model="imgScaleSelect" :items=itemsScaleSelect @update:model-value="rescaleImage"></v-select>
         </v-col>
         <v-col>
-          <Popup v-if="image != null" :scale="imageProportional" :imgSize="imgSize.split('x')"/>
+          <Popup v-if="image != null" :imageToDialog="image" :imgSizeToDialog="imgSize.split('x')" @submitResolution="changeResolution"/>
+        </v-col>
+        <v-col>
+         <v-btn color="grey" @click="saveImage">SAVE</v-btn>
         </v-col>
     </v-col>
   </v-row>
@@ -47,8 +50,8 @@
 import Popup from '../components/popup.vue';
 export default{
   props: {
-    scale: Number,
-    imgSize: Array
+    imgSizeToDialog: Array,
+    imageToDialog: HTMLElement
   },
   components: { Popup },
   data() {
@@ -135,6 +138,42 @@ export default{
       let y = (this.canvas.height - this.image.height * scale) / 2;
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.drawImage(this.image, x, y, this.image.width * scale, this.image.height * scale);
+    },
+    changeResolution(oldWidth, newWidth, oldHeight, newHeight){
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+      this.canvas.width = oldWidth
+      this.canvas.height = oldHeight
+      this.ctx.drawImage(this.image, 0, 0, oldWidth, oldHeight)
+      const oldImageData = this.ctx.getImageData(0, 0, oldWidth, oldHeight)
+      const newImageData = this.ctx.createImageData(newWidth, newHeight)
+      this.ctx.clearRect(0, 0, oldWidth, oldHeight)
+
+      const dx = oldWidth / newWidth;
+      const dy = oldHeight / newHeight;
+      for (let y = 0; y < newHeight; y++) {
+          for (let x = 0; x < newWidth; x++) {
+              const srcY = Math.floor(y * dy);
+              const srcX = Math.floor(x * dx);
+              const oldIndex = (srcY * oldImageData.width + srcX) * 4
+              const newIndex = (y * newImageData.width + x) * 4
+
+              newImageData.data[newIndex] = oldImageData.data[oldIndex]; // R 
+              newImageData.data[newIndex + 1] = oldImageData.data[oldIndex + 1]; // G 
+              newImageData.data[newIndex + 2] = oldImageData.data[oldIndex + 2]; // B 
+              newImageData.data[newIndex + 3] = oldImageData.data[oldIndex + 3]; // A 
+          }
+      }
+      this.canvas.width = newWidth
+      this.canvas.height = newHeight
+      this.ctx.putImageData(newImageData, 0, 0)
+    },
+    saveImage(){  
+      window.open(this.canvas.toDataURL('image/png'));
+      var gh = this.canvas.toDataURL('png');
+      var a  = document.createElement('a');
+      a.href = gh;
+      a.download = 'image.png';
+      a.click()
     }
   }
 }
