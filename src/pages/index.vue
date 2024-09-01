@@ -59,34 +59,7 @@ export default{
     this.ctx = this.canvas.getContext('2d')
   },
   methods: {
-    initial(src){
-      this.image = new Image()
-      this.image.crossOrigin = 'anonymous';
-      this.image.onload = () => {
-        const max = Math.max(this.image.width, this.image.height)
-        const min = Math.min(this.image.width, this.image.height)
-        const prop = min / max
-        if(window.innerWidth >= window.innerHeight){
-          this.canvas.width = window.innerWidth
-          this.canvas.height = window.innerWidth * prop
-        }
-        else{
-          this.canvas.width = window.innerHeight * prop
-          this.canvas.height = window.innerHeight
-        }
-
-        let scale = Math.min(this.canvas.width / this.image.width, this.canvas.height / this.image.height)
-        let x = (this.canvas.width - this.image.width * scale) / 2;
-        let y = (this.canvas.height - this.image.height * scale) / 2;
-
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Очистка холста
-        this.ctx.drawImage(this.image, x, y, this.image.width * scale, this.image.height * scale);
-        this.imgSize = `${this.image.width}x${this.image.height}`
-        this.imgScaleSelect = String(Math.round(scale * 100)) + '%'
-      }
-
-      this.image.src = src
-
+    initMouseMoveAlg(){
       this.canvas.addEventListener("mousemove", (e) => {
           let rect = this.canvas.getBoundingClientRect();
           var x = Math.round(e.x - rect.left);
@@ -98,6 +71,45 @@ export default{
           this.coordText = `(${x}, ${y})`
           this.rgbText = `(${r},${g},${b})`
         });
+    },
+    initProp(scale){
+        const max = Math.max(this.image.width * scale, this.image.height * scale)
+        const min = Math.min(this.image.width * scale, this.image.height * scale)
+        const prop = max / min
+        if(window.innerWidth >= this.image.width * scale && window.innerHeight >= this.image.height * scale){
+          if(this.image.width * scale >= this.image.height * scale){
+            this.canvas.width = this.image.width * scale
+            this.canvas.height = this.image.height * scale
+          }
+          else{
+            this.canvas.width = this.image.width * scale
+            this.canvas.height = this.image.height * scale
+          }
+        }
+        else{
+          if(window.innerWidth >= window.innerHeight){
+            this.canvas.width = window.innerHeight * prop - 150
+            this.canvas.height = window.innerHeight - 150
+          }
+          else{
+            this.canvas.width = window.innerWidth - 150
+            this.canvas.height = window.innerWidth * prop - 150
+          }
+        }
+    },
+    initial(src){
+      this.image = new Image()
+      this.image.crossOrigin = 'anonymous';
+      this.image.onload = () => {
+        this.initProp(1)
+        let scale = Math.max(this.canvas.width / this.image.width, this.canvas.height / this.image.height)
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Очистка холста
+        this.ctx.drawImage(this.image, 0, 0, this.image.width * scale, this.image.height * scale);
+        this.imgSize = `${this.image.width}x${this.image.height}`
+        this.imgScaleSelect = String(Math.round(scale * 100)) + '%'
+      }
+      this.image.src = src
+      this.initMouseMoveAlg()
     },
     uploadImage(e){
       this.initial(URL.createObjectURL(e.target.files[0]))
@@ -107,22 +119,11 @@ export default{
     },
     rescaleImage(){
       let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
+      this.initProp(scale)
       let x = (this.canvas.width - this.image.width * scale) / 2;
       let y = (this.canvas.height - this.image.height * scale) / 2;
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.drawImage(this.image, x, y, this.image.width * scale, this.image.height * scale);
-
-      this.canvas.addEventListener("mousemove", (e) => {
-          let rect = this.canvas.getBoundingClientRect();
-          var x = Math.round(e.x - rect.left);
-          var y = Math.round(e.y - rect.top);
-          var canvasColor = this.ctx.getImageData(x, y, 1, 1).data;
-          var r = canvasColor[0];
-          var g = canvasColor[1];
-          var b = canvasColor[2];
-          this.coordText = `(${x}, ${y})`
-          this.rgbText = `(${r},${g},${b})`
-        });
     }
   }
 }
