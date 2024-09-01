@@ -57,17 +57,28 @@ export default{
   mounted() {
     this.canvas = document.getElementById("imgCanvas")
     this.ctx = this.canvas.getContext('2d')
-    this.canvas.width = window.innerWidth - 150
-    this.canvas.height = window.innerHeight - 150
   },
   methods: {
     initial(src){
       this.image = new Image()
       this.image.crossOrigin = 'anonymous';
       this.image.onload = () => {
-        let scale = Math.min(this.canvas.width / this.image.width, this.canvas.height / this.image.height);
+        const max = Math.max(this.image.width, this.image.height)
+        const min = Math.min(this.image.width, this.image.height)
+        const prop = min / max
+        if(window.innerWidth >= window.innerHeight){
+          this.canvas.width = window.innerWidth
+          this.canvas.height = window.innerWidth * prop
+        }
+        else{
+          this.canvas.width = window.innerHeight * prop
+          this.canvas.height = window.innerHeight
+        }
+
+        let scale = Math.min(this.canvas.width / this.image.width, this.canvas.height / this.image.height)
         let x = (this.canvas.width - this.image.width * scale) / 2;
         let y = (this.canvas.height - this.image.height * scale) / 2;
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); // Очистка холста
         this.ctx.drawImage(this.image, x, y, this.image.width * scale, this.image.height * scale);
         this.imgSize = `${this.image.width}x${this.image.height}`
