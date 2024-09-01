@@ -31,16 +31,22 @@
         <v-col><h1 class="h1 text-center">{{ coordText }}</h1></v-col>
       </v-row>
     </v-col>
-    <v-col>
-      <v-select label="Масштаб" v-model="imgScaleSelect" :items=itemsScaleSelect @update:model-value="rescaleImage"></v-select>
+    <v-col align="center" justify="center">
+        <v-col>
+          <v-select label="Масштаб" v-model="imgScaleSelect" :items=itemsScaleSelect @update:model-value="rescaleImage"></v-select>
+        </v-col>
+        <v-col>
+          <Popup/>
+        </v-col>
     </v-col>
   </v-row>
-
 
 </template>
 
 <script>
+import Popup from '../components/popup.vue';
 export default{
+  components: { Popup },
   data() {
     return{
       image: null,
@@ -51,7 +57,7 @@ export default{
       rgbText: "",
       imgSize: "",
       imgScaleSelect: "",
-      itemsScaleSelect: ['12%', '25%', '35%', '50%', '100%', '150%', '200%', '300%']
+      itemsScaleSelect: ['12%', '25%', '35%', '50%', '100%', '150%', '200%', '300%'],
     }
   },
   mounted() {
