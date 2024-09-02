@@ -10,7 +10,11 @@
       <p class="text-center">OR</p>
       <v-text-field v-model="imgUrl" label="Image URL"></v-text-field>
       <v-btn class="mt-2" color="green-lighten-1" text="Submit" type="submit" block></v-btn>
-    </v-form> 
+    </v-form>
+  </v-container>
+
+  <v-container>
+    <Toolbar @toolChoosed="handScroller"></Toolbar>
   </v-container>
 
   <v-container class="d-flex justify-center">
@@ -47,6 +51,7 @@
 </template>
 
 <script>
+import Toolbar from '@/components/toolbar.vue';
 import Popup from '../components/popup.vue';
 export default{
   props: {
@@ -65,6 +70,8 @@ export default{
       imgSize: "",
       imgScaleSelect: "",
       imageProportional: 0,
+      imgStartX: 0,
+      imgStartY: 0,
       itemsScaleSelect: ['12%', '25%', '35%', '50%', '100%', '150%', '200%', '300%'],
     }
   },
@@ -102,12 +109,12 @@ export default{
         }
         else{
           if(window.innerWidth >= window.innerHeight){
-            this.canvas.width = window.innerHeight * this.imageProportional - 150
-            this.canvas.height = window.innerHeight - 150
+            this.canvas.width = window.innerHeight * this.imageProportional - 250
+            this.canvas.height = window.innerHeight - 250
           }
           else{
-            this.canvas.width = window.innerWidth - 150
-            this.canvas.height = window.innerWidth * this.imageProportional - 150
+            this.canvas.width = window.innerWidth - 250
+            this.canvas.height = window.innerWidth * this.imageProportional - 250
           }
         }
     },
@@ -134,10 +141,10 @@ export default{
     rescaleImage(){
       let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
       this.initProp(scale)
-      let x = (this.canvas.width - this.image.width * scale) / 2;
-      let y = (this.canvas.height - this.image.height * scale) / 2;
+      this.imgStartX = (this.canvas.width - this.image.width * scale) / 2;
+      this.imgStartY = (this.canvas.height - this.image.height * scale) / 2;
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.drawImage(this.image, x, y, this.image.width * scale, this.image.height * scale);
+      this.ctx.drawImage(this.image, this.imgStartX, this.imgStartY, this.image.width * scale, this.image.height * scale);
     },
     changeResolution(oldWidth, newWidth, oldHeight, newHeight){
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
@@ -174,6 +181,65 @@ export default{
       a.href = gh;
       a.download = 'image.png';
       a.click()
+    },
+    handScroller(id){
+      let isMouseDown = false
+      let startX = null
+      let startY = null
+
+      let dx = 0
+      let dy = 0
+
+      this.canvas.addEventListener("mousedown", (e) => {
+        isMouseDown = true
+        let rect = this.canvas.getBoundingClientRect();
+        startX = Math.round(e.x - rect.left);
+        startY = Math.round(e.y - rect.top);
+        });
+
+      this.canvas.addEventListener("mouseup", (e) => {
+        isMouseDown = false
+        startX = null
+        startY = null
+
+        this.imgStartX = this.imgStartX - dx
+        this.imgStartY = this.imgStartY - dy
+
+        });
+
+      this.canvas.addEventListener("mousemove", (e) =>{     
+        if(isMouseDown){ 
+          let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
+          if(scale > 1){
+            const zeroCoordX = (this.canvas.width - this.image.width * scale) / 2;
+            const zeroCoordY = (this.canvas.height - this.image.height * scale) / 2;
+            let rect = this.canvas.getBoundingClientRect();
+            let newX = Math.round(e.x - rect.left);
+            let newY = Math.round(e.y - rect.top);
+            dx = startX - newX
+            dy = startY - newY
+            
+            // if(this.imgStartX - dx + zeroCoordX < 0){
+            //   this.ctx.drawImage(this.image, 0, this.imgStartY - dy, this.image.width * scale, this.image.height * scale);
+            // }
+            // if(this.imgStartY - dy < 0){
+            //   this.imgStartY = 0
+            // }
+            // if(this.imgStartX - dx + this.image.width * scale > this.image.width){
+            //   this.imgStartX = this.image.width - this.image.width * scale
+            // }
+            // if(this.imgStartY - dy + this.image.height * scale > this.image.height){
+            //   this.imgStartY = this.image.height - this.image.height * scale
+            // }
+
+
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.drawImage(this.image, 0 - dx, 0 - dy, this.image.width * scale, this.image.height * scale);
+            console.log(this.imgStartX - dx, this.imgStartY - dy)
+            console.log(dx, dy)
+          }
+        }
+      })
     }
   }
 }
