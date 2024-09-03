@@ -69,6 +69,7 @@ export default{
       rgbText: "",
       imgSize: "",
       imgScaleSelect: "",
+      firstImgScaleSelect: 0,
       imageProportional: 0,
       imgStartX: 0,
       imgStartY: 0,
@@ -109,12 +110,12 @@ export default{
         }
         else{
           if(window.innerWidth >= window.innerHeight){
-            this.canvas.width = window.innerHeight * this.imageProportional - 250
-            this.canvas.height = window.innerHeight - 250
+            this.canvas.width = window.innerHeight * this.imageProportional - 500
+            this.canvas.height = window.innerHeight - 350
           }
           else{
-            this.canvas.width = window.innerWidth - 250
-            this.canvas.height = window.innerWidth * this.imageProportional - 250
+            this.canvas.width = window.innerWidth - 500
+            this.canvas.height = window.innerWidth * this.imageProportional - 350
           }
         }
     },
@@ -128,6 +129,7 @@ export default{
         this.ctx.drawImage(this.image, 0, 0, this.image.width * scale, this.image.height * scale);
         this.imgSize = `${this.image.width}x${this.image.height}`
         this.imgScaleSelect = String(Math.round(scale * 100)) + '%'
+        this.firstImgScaleSelect = scale
       }
       this.image.src = src
       this.initMouseMoveAlg()
@@ -190,11 +192,18 @@ export default{
       let dx = 0
       let dy = 0
 
+      let tempX = this.imgStartX
+      let tempY = this.imgStartY
+
       this.canvas.addEventListener("mousedown", (e) => {
         isMouseDown = true
         let rect = this.canvas.getBoundingClientRect();
         startX = Math.round(e.x - rect.left);
         startY = Math.round(e.y - rect.top);
+
+        tempX = this.imgStartX
+        tempY = this.imgStartY
+
         });
 
       this.canvas.addEventListener("mouseup", (e) => {
@@ -202,44 +211,35 @@ export default{
         startX = null
         startY = null
 
-        this.imgStartX = this.imgStartX - dx
-        this.imgStartY = this.imgStartY - dy
+        this.imgStartX = tempX
+        this.imgStartY = tempY
 
         });
 
       this.canvas.addEventListener("mousemove", (e) =>{     
         if(isMouseDown){ 
           let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
-          if(scale > 1){
-            const zeroCoordX = (this.canvas.width - this.image.width * scale) / 2;
-            const zeroCoordY = (this.canvas.height - this.image.height * scale) / 2;
+          if(scale > this.firstImgScaleSelect){
             let rect = this.canvas.getBoundingClientRect();
             let newX = Math.round(e.x - rect.left);
             let newY = Math.round(e.y - rect.top);
+
             dx = startX - newX
             dy = startY - newY
             
-            // if(this.imgStartX - dx + zeroCoordX < 0){
-            //   this.ctx.drawImage(this.image, 0, this.imgStartY - dy, this.image.width * scale, this.image.height * scale);
-            // }
-            // if(this.imgStartY - dy < 0){
-            //   this.imgStartY = 0
-            // }
-            // if(this.imgStartX - dx + this.image.width * scale > this.image.width){
-            //   this.imgStartX = this.image.width - this.image.width * scale
-            // }
-            // if(this.imgStartY - dy + this.image.height * scale > this.image.height){
-            //   this.imgStartY = this.image.height - this.image.height * scale
-            // }
+            tempX = Math.min(this.imgStartX - dx, 0)
+            tempX = Math.max(tempX, -this.image.width * scale + this.canvas.width)
 
+            tempY = Math.min(this.imgStartY - dy, 0)
+            tempY = Math.max(tempY, -this.image.height * scale + this.canvas.height)
+
+            console.log(tempX, tempY)
 
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.drawImage(this.image, 0 - dx, 0 - dy, this.image.width * scale, this.image.height * scale);
-            console.log(this.imgStartX - dx, this.imgStartY - dy)
-            console.log(dx, dy)
+            this.ctx.drawImage(this.image, tempX, tempY, this.image.width * scale, this.image.height * scale);
+            }
           }
-        }
-      })
+        })
     }
   }
 }
