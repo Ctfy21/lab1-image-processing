@@ -14,8 +14,13 @@
   </v-container>
 
   <v-container>
-    <Toolbar @toolChoosed="eventToolBarListener"></Toolbar>
+    <Toolbar id="toolbar" @toolChoosed="eventToolBarListener"></Toolbar>
   </v-container>
+
+  <v-card v-show="eyeDropperShow" id="eyedropperCard" align="center" justify="center" class="pa-4" style="width: fit-content;" text="Eyedropper">
+    <canvas class="mr-3" id="firstColorCanvas" width="20" height="20"></canvas>
+    <canvas id="secondColorCanvas" width="20" height="20"></canvas>
+  </v-card>
 
   <v-container class="d-flex justify-center">
       <canvas id="imgCanvas"></canvas>
@@ -83,9 +88,9 @@ export default{
       tempX: null,
       tempY: null,
       dx: 0,
-      dy: 0
+      dy: 0,
 
-
+      eyeDropperShow: false
     }
   },
   mounted() {
@@ -201,12 +206,35 @@ export default{
         case 0:
           this.handScroller()
           break
+        case 1:
+          this.eyeDropper()
         default:
           this.removeHandScroller()
           break
       }
     },
-    handScroller(){
+    eyeDropper(){
+      this.eyeDropperShow = true
+      const firstColorCanvas = document.getElementById("firstColorCanvas")
+      const secondColorCanvas = document.getElementById("secondColorCanvas")
+      const ctxFirstColor = firstColorCanvas.getContext('2d')
+      const ctxSecondColor = secondColorCanvas.getContext('2d')
+      ctxFirstColor.fillStyle = "red";
+      ctxFirstColor.fillRect(0, 0, firstColorCanvas.width, firstColorCanvas.height);
+      ctxSecondColor.fillStyle = "blue";
+      ctxSecondColor.fillRect(0, 0, secondColorCanvas.width, secondColorCanvas.height);
+
+      setTimeout(this.eyeDropperOffset, 1)
+    },
+    eyeDropperOffset(){
+      const toolbar = document.getElementById("toolbar")
+      const eyedropperCard = document.getElementById("eyedropperCard")
+      const eyedropperCardWidth = eyedropperCard.offsetWidth / 2
+      const offset = (toolbar.offsetLeft + toolbar.offsetWidth * 0.75) - eyedropperCardWidth
+      eyedropperCard.style.marginLeft = offset + "px"
+      console.log(offset, toolbar.offsetLeft, toolbar.offsetWidth * 0.75, eyedropperCardWidth )
+    },
+    handScroller(){ 
       this.isMouseDown = false
 
       this.startX = null
