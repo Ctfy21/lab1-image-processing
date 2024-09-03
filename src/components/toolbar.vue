@@ -31,7 +31,6 @@
         methods: {
           toolChoosed(){
             this.$emit('toolChoosed', this.toggleToolId)
-            console.log("enter hand")
           }
         }
     }

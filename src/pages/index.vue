@@ -14,7 +14,7 @@
   </v-container>
 
   <v-container>
-    <Toolbar @toolChoosed="handScroller"></Toolbar>
+    <Toolbar @toolChoosed="eventToolBarListener"></Toolbar>
   </v-container>
 
   <v-container class="d-flex justify-center">
@@ -64,16 +64,28 @@ export default{
       image: null,
       canvas: null,
       ctx: null,
+
       imgUrl: "",
       coordText: "",
       rgbText: "",
       imgSize: "",
+
       imgScaleSelect: "",
       firstImgScaleSelect: 0,
+      itemsScaleSelect: ['12%', '25%', '35%', '50%', '100%', '150%', '200%', '300%'],
       imageProportional: 0,
+
       imgStartX: 0,
       imgStartY: 0,
-      itemsScaleSelect: ['12%', '25%', '35%', '50%', '100%', '150%', '200%', '300%'],
+      isMouseDown: false,
+      startX: null,
+      startY: null,
+      tempX: null,
+      tempY: null,
+      dx: 0,
+      dy: 0
+
+
     }
   },
   mounted() {
@@ -184,62 +196,77 @@ export default{
       a.download = 'image.png';
       a.click()
     },
-    handScroller(id){
-      let isMouseDown = false
-      let startX = null
-      let startY = null
+    eventToolBarListener(id){
+      switch(id){
+        case 0:
+          this.handScroller()
+          break
+        default:
+          this.removeHandScroller()
+          break
+      }
+    },
+    handScroller(){
+      this.isMouseDown = false
 
-      let dx = 0
-      let dy = 0
+      this.startX = null
+      this.startY = null
 
-      let tempX = this.imgStartX
-      let tempY = this.imgStartY
+      this.dx = 0
+      this.dy = 0
 
-      this.canvas.addEventListener("mousedown", (e) => {
-        isMouseDown = true
+      this.tempX = 0
+      this.tempY = 0
+
+      this.canvas.addEventListener("mousedown", this.handScrollerMouseDownHandler)
+      
+      this.canvas.addEventListener("mouseup", this.handScrollerMouseUpHandler)
+
+      this.canvas.addEventListener("mousemove", this.handScrollerMouseMoveHandler)
+    },
+    handScrollerMouseDownHandler(e){
+        this.isMouseDown = true
         let rect = this.canvas.getBoundingClientRect();
-        startX = Math.round(e.x - rect.left);
-        startY = Math.round(e.y - rect.top);
+        this.startX = Math.round(e.x - rect.left);
+        this.startY = Math.round(e.y - rect.top);
 
-        tempX = this.imgStartX
-        tempY = this.imgStartY
+        this.tempX = this.imgStartX
+        this.tempY = this.imgStartY
+    },
+    handScrollerMouseUpHandler(){
+        this.isMouseDown = false
+        this.startX = null
+        this.startY = null
 
-        });
-
-      this.canvas.addEventListener("mouseup", (e) => {
-        isMouseDown = false
-        startX = null
-        startY = null
-
-        this.imgStartX = tempX
-        this.imgStartY = tempY
-
-        });
-
-      this.canvas.addEventListener("mousemove", (e) =>{     
-        if(isMouseDown){ 
+        this.imgStartX = this.tempX
+        this.imgStartY = this.tempY
+    },
+    handScrollerMouseMoveHandler(e){
+      if(this.isMouseDown){ 
           let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
           if(scale > this.firstImgScaleSelect){
             let rect = this.canvas.getBoundingClientRect();
             let newX = Math.round(e.x - rect.left);
             let newY = Math.round(e.y - rect.top);
 
-            dx = startX - newX
-            dy = startY - newY
+            this.dx = this.startX - newX
+            this.dy = this.startY - newY
             
-            tempX = Math.min(this.imgStartX - dx, 0)
-            tempX = Math.max(tempX, -this.image.width * scale + this.canvas.width)
+            this.tempX = Math.min(this.imgStartX - this.dx, 0)
+            this.tempX = Math.max(this.tempX, -this.image.width * scale + this.canvas.width)
 
-            tempY = Math.min(this.imgStartY - dy, 0)
-            tempY = Math.max(tempY, -this.image.height * scale + this.canvas.height)
-
-            console.log(tempX, tempY)
+            this.tempY = Math.min(this.imgStartY - this.dy, 0)
+            this.tempY = Math.max(this.tempY, -this.image.height * scale + this.canvas.height)
 
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.drawImage(this.image, tempX, tempY, this.image.width * scale, this.image.height * scale);
-            }
+            this.ctx.drawImage(this.image, this.tempX, this.tempY, this.image.width * scale, this.image.height * scale);
           }
-        })
+        }
+    },
+    removeHandScroller(){
+      this.canvas.removeEventListener("mousedown", this.handScrollerMouseDownHandler)
+      this.canvas.removeEventListener("mousemove", this.handScrollerMouseMoveHandler)
+      this.canvas.removeEventListener("mouseup", this.handScrollerMouseUpHandler)
     }
   }
 }
