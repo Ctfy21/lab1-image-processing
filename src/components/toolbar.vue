@@ -1,5 +1,5 @@
 <template>
-      <v-btn-toggle v-model="toggleToolId"> 
+      <v-btn-toggle class="ml-15" v-model="toggleToolId"> 
         <v-tooltip v-for="item in toolbarItems" v-bind:key="item.title" max-width="300px" location="top" :text="item.description">
           <template v-slot:activator="{ props }">
               <v-btn @click="toolChoosed" v-bind="props" icon>
