@@ -102,6 +102,9 @@
           <v-select label="Масштаб" v-model="imgScaleSelect" :items=itemsScaleSelect @update:model-value="rescaleImage"></v-select>
         </v-col>
         <v-col>
+          <v-select label="Скорость скролла мышкой" v-model="mouseWheelSpeed" :items=mouseWheelSpeedSelect></v-select>
+        </v-col>
+        <v-col>
           <Popup v-if="image != null" :imageToDialog="image" :imgSizeToDialog="imgSize.split('x')" @submitResolution="changeResolution"/>
         </v-col>
         <v-col>
@@ -148,7 +151,10 @@ export default{
       dy: 0,
 
       eyeDropperShow: false,
-      rgbDarkestArray: []
+      rgbDarkestArray: [],
+
+      mouseWheelSpeed: "100%",
+      mouseWheelSpeedSelect: ["25%", "50%", "100%", "150%", "200%", "300%"]
     }
   },
   mounted() {
@@ -344,6 +350,7 @@ export default{
       }
       this.image.src = src
       this.initMouseMoveAlg()
+      this.canvas.addEventListener("wheel", this.handScrollerMouseWheelHandler)
     },
     uploadImage(e){
       this.initial(URL.createObjectURL(e.target.files[0]))
@@ -354,8 +361,8 @@ export default{
     rescaleImage(){
       let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
       this.initProp(scale)
-      this.imgStartX = (this.canvas.width - this.image.width * scale) / 2;
-      this.imgStartY = (this.canvas.height - this.image.height * scale) / 2;
+      this.imgStartX = Math.floor((this.canvas.width - this.image.width * scale) / 2);
+      this.imgStartY = Math.floor((this.canvas.height - this.image.height * scale) / 2);
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.drawImage(this.image, this.imgStartX, this.imgStartY, this.image.width * scale, this.image.height * scale);
     },
@@ -445,6 +452,21 @@ export default{
       this.canvas.addEventListener("mouseup", this.handScrollerMouseUpHandler)
 
       this.canvas.addEventListener("mousemove", this.handScrollerMouseMoveHandler)
+    },
+    handScrollerMouseWheelHandler(e){
+      e.preventDefault();
+      let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
+          if(scale > this.firstImgScaleSelect){
+            this.dy = Math.floor(e.deltaY * 0.01 * scale * Number(this.mouseWheelSpeed.substring(0, this.mouseWheelSpeed.length - 1)) / 100)
+
+            this.tempY = Math.min(this.imgStartY - this.dy, 0)
+            this.tempY = Math.floor(Math.max(this.tempY, -this.image.height * scale + this.canvas.height))
+
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.drawImage(this.image, this.imgStartX, this.tempY, this.image.width * scale, this.image.height * scale);
+
+            this.imgStartY = this.tempY
+          }
     },
     handScrollerMouseDownHandler(e){
         this.isMouseDown = true
