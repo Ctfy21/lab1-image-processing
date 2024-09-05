@@ -349,14 +349,16 @@ export default{
         console.log(this.rgbDarkestArray)
       }
       this.image.src = src
-      this.initMouseMoveAlg()
-      this.canvas.addEventListener("wheel", this.handScrollerMouseWheelHandler)
     },
     uploadImage(e){
       this.initial(URL.createObjectURL(e.target.files[0]))
+      this.initMouseMoveAlg()
+      this.canvas.addEventListener("wheel", this.handScrollerMouseWheelHandler)
     },
     submitImgUrl() {
       this.initial(this.imgUrl)
+      this.initMouseMoveAlg()
+      this.canvas.addEventListener("wheel", this.handScrollerMouseWheelHandler)
     },
     rescaleImage(){
       let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
@@ -393,6 +395,7 @@ export default{
       this.canvas.width = newWidth
       this.canvas.height = newHeight
       this.ctx.putImageData(newImageData, 0, 0)
+      this.initial(this.canvas.toDataURL())
     },
     saveImage(){  
       window.open(this.canvas.toDataURL('image/png'));
