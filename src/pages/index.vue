@@ -147,7 +147,8 @@ export default{
       dx: 0,
       dy: 0,
 
-      eyeDropperShow: false
+      eyeDropperShow: false,
+      rgbDarkestArray: []
     }
   },
   mounted() {
@@ -196,10 +197,7 @@ export default{
               let rNew = r/255.0; let gNew = g/255.0; let bNew = b/255.0;
 
               const foregroundLum = this.measureLuminance(rNew, gNew, bNew)
-              const eyedropperCard = document.getElementById("eyedropperCard")
-              const rgbText = window.getComputedStyle(eyedropperCard).backgroundColor
-              const rgbArray = rgbText.match(/\b\d+\b/g)
-              const backgroundLum = this.measureLuminance(rgbArray[0]/255, rgbArray[1]/255, rgbArray[2]/255)
+              const backgroundLum = this.measureLuminance(this.rgbDarkestArray[0]/255, this.rgbDarkestArray[1]/255, this.rgbDarkestArray[2]/255)
               const secondColorContrast = document.getElementById("secondColorContrast")
               let contrast = ((foregroundLum + 0.05) / (backgroundLum + 0.05)).toFixed(3)
               secondColorContrast.innerHTML = "Contrast: " + contrast
@@ -255,38 +253,52 @@ export default{
               firstColorRGB.innerHTML = `RGB: (${r}, ${g}, ${b})` 
 
               let rNew = r/255.0; let gNew = g/255.0; let bNew = b/255.0;
-              if (rNew > 0.04045) r = Math.pow((rNew + 0.055) / 1.055, 2.4);
-              else rNew = rNew / 12.92;
-              if (gNew > 0.04045) gNew = Math.pow((gNew + 0.055) / 1.055, 2.4);
-              else gNew = gNew / 12.92;
-              if (bNew > 0.04045) bNew = Math.pow((bNew + 0.055) / 1.055, 2.4);
-              else bNew = bNew / 12.92;
-              rNew = 100*rNew; gNew = 100*gNew; bNew = 100*bNew;
-
-              var x = rNew*0.4124 + gNew*0.3576 + bNew*0.1805;
-              var y = rNew*0.2126 + gNew*0.7152 + bNew*0.0722;
-              var z = rNew*0.0193 + gNew*0.1192 + bNew*0.9505;
               
+              const foregroundLum = this.measureLuminance(rNew, gNew, bNew)
+              const backgroundLum = this.measureLuminance(this.rgbDarkestArray[0]/255, this.rgbDarkestArray[1]/255, this.rgbDarkestArray[2]/255)
+              const firstColorContrast = document.getElementById("firstColorContrast")
+              let contrast = ((foregroundLum + 0.05) / (backgroundLum + 0.05)).toFixed(3)
+              firstColorContrast.innerHTML = "Contrast: " + contrast
               const firstColorXYZ = document.getElementById("firstColorXYZ")
-              firstColorXYZ.innerHTML = `XYZ: (${x.toFixed(3)}, ${y.toFixed(3)}, ${z.toFixed(3)})`              
-
-              x = x/95.047; y = y/100.000; z = z/108.883;
-              if ( x > 0.008856 ) x = Math.pow(x, 0.33);
-              else x = ( 7.787 * x ) + 0.1379;
-              if ( y > 0.008856 ) y = Math.pow(y, 0.33);
-              else y = ( 7.787 * y ) + 0.1379;
-              if ( z > 0.008856 ) z = Math.pow(z, 0.33);
-              else z = ( 7.787 * z ) + 0.1379;
-              var lLab = ( 116 * y ) - 16;
-              var aLab = 500 * ( x - y );
-              var bLab = 200 * ( y - z );
-
-              lLab = lLab/50.0 - 1.0 
-              aLab = aLab/100.0
-              bLab = bLab/100.0;
-
               const firstColorLAB = document.getElementById("firstColorLAB")
-              firstColorLAB.innerHTML = `LAB: (${lLab.toFixed(3)}, ${aLab.toFixed(3)}, ${bLab.toFixed(3)})`    
+              if(contrast < 4.5){
+                firstColorXYZ.innerHTML = "Contrast not enough"
+                firstColorLAB.innerHTML = "Contrast not enough"
+              }
+              else{
+                if (rNew > 0.04045) r = Math.pow((rNew + 0.055) / 1.055, 2.4);
+                else rNew = rNew / 12.92;
+                if (gNew > 0.04045) gNew = Math.pow((gNew + 0.055) / 1.055, 2.4);
+                else gNew = gNew / 12.92;
+                if (bNew > 0.04045) bNew = Math.pow((bNew + 0.055) / 1.055, 2.4);
+                else bNew = bNew / 12.92;
+                rNew = 100*rNew; gNew = 100*gNew; bNew = 100*bNew;
+
+                var x = rNew*0.4124 + gNew*0.3576 + bNew*0.1805;
+                var y = rNew*0.2126 + gNew*0.7152 + bNew*0.0722;
+                var z = rNew*0.0193 + gNew*0.1192 + bNew*0.9505;
+                
+                const firstColorXYZ = document.getElementById("firstColorXYZ")
+                firstColorXYZ.innerHTML = `XYZ: (${x.toFixed(3)}, ${y.toFixed(3)}, ${z.toFixed(3)})`              
+
+                x = x/95.047; y = y/100.000; z = z/108.883;
+                if ( x > 0.008856 ) x = Math.pow(x, 0.33);
+                else x = ( 7.787 * x ) + 0.1379;
+                if ( y > 0.008856 ) y = Math.pow(y, 0.33);
+                else y = ( 7.787 * y ) + 0.1379;
+                if ( z > 0.008856 ) z = Math.pow(z, 0.33);
+                else z = ( 7.787 * z ) + 0.1379;
+                var lLab = ( 116 * y ) - 16;
+                var aLab = 500 * ( x - y );
+                var bLab = 200 * ( y - z );
+
+                lLab = lLab/50.0 - 1.0 
+                aLab = aLab/100.0
+                bLab = bLab/100.0;
+
+                const firstColorLAB = document.getElementById("firstColorLAB")
+                firstColorLAB.innerHTML = `LAB: (${lLab.toFixed(3)}, ${aLab.toFixed(3)}, ${bLab.toFixed(3)})`    
+              }
             }
           }
         });
@@ -327,6 +339,8 @@ export default{
         this.imgSize = `${this.image.width}x${this.image.height}`
         this.imgScaleSelect = String(Math.round(scale * 100)) + '%'
         this.firstImgScaleSelect = scale
+        this.rgbDarkestArray = this.getDarkestPixelOfImage()
+        console.log(this.rgbDarkestArray)
       }
       this.image.src = src
       this.initMouseMoveAlg()
@@ -485,6 +499,31 @@ export default{
       else bNew = bNew / 12.92;
 
       return 0.2126 * rNew + 0.7152 * bNew + 0.0722 * gNew
+    },
+    getDarkestPixelOfImage(){
+      const canvas = document.createElement("canvas")
+      const ctx = canvas.getContext("2d")
+      ctx.clearRect(0, 0, this.image.width, this.image.height); // Очистка холста
+      ctx.drawImage(this.image, 0, 0, this.image.width, this.image.height);
+      let minR = 255
+      let minG = 255
+      let minB = 255
+      let imageData = ctx.getImageData(0, 0, this.image.width, this.image.height)
+      for (let y = 0; y < imageData.height; y++) {
+        for (let x = 0; x < imageData.width; x++) {
+
+          const index = (y * imageData.width + x) * 4
+
+          let r = imageData.data[index]
+          let g = imageData.data[index + 1]
+          let b = imageData.data[index + 2]
+
+          minR = Math.min(minR, r)
+          minG = Math.min(minG, g)
+          minB = Math.min(minB, b)
+        }
+      }
+      return [minR, minG, minB]
     }
   }
 }
