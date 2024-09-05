@@ -24,9 +24,10 @@
           <canvas class="mb-3" id="firstColorCanvas" width="20" height="20"></canvas>
           <p class="mb-3" id="firstColorCoord">X,Y: (0,0)</p>
           <p class="mb-3" id="firstColorRGB">RGB: (0,0,0)</p>
+          <p class="mb-3" id="firstColorContrast">Contrast: 0</p>
           <v-container class="d-flex flex-row pa-0 mb-3">
           <p class="mr-4" id="firstColorXYZ">XYZ: (0,0,0)</p>
-          <v-tooltip max-width="300" text="Define the relationship between the visible spectrum and the visual sensation of specific colors by human color vision. The CIE color spaces are mathematical models that create a 'standard observer', which attempts to predict the perception of unique hues of color. These color spaces are essential tools that provide the foundation for measuring color for industry, including inks, dyes, and paints, illumination, color imaging, etc.">
+          <v-tooltip max-width="300" text="In the CIE 1931 model, Y is the luminance, Z is quasi-equal to blue (of CIE RGB), and X is a mix of the three CIE RGB curves chosen to be nonnegative. Setting Y as luminance has the useful result that for any given Y value, the XZ plane will contain all possible chromaticities at that luminance.">
             <template v-slot:activator="{ props }">
               <v-btn color="blue" width="25" height="25" v-bind="props" icon>
                 <v-icon icon="mdi-help"></v-icon>
@@ -36,7 +37,7 @@
           </v-container>
           <v-container class="d-flex flex-row pa-0 mb-3">
           <p class="mr-4" id="firstColorLAB">LAB: (0,0,0)</p>
-            <v-tooltip max-width="300" text="The CIELAB color space, also referred to as L*a*b*, is a color space defined by the International Commission on Illumination (abbreviated CIE) in 1976. It expresses color as three values: L* for perceptual lightness and a* and b* for the four unique colors of human vision: red, green, blue and yellow. CIELAB was intended as a perceptually uniform space, where a given numerical change corresponds to a similar perceived change in color. While the LAB space is not truly perceptually uniform, it nevertheless is useful in industry for detecting small differences in color.">
+            <v-tooltip max-width="300" text="The CIELAB color space, also referred to as L*a*b*, is a color space defined by the International Commission on Illumination (abbreviated CIE) in 1976. It expresses color as three values: L* for perceptual lightness and a* and b* for the four unique colors of human vision: red, green, blue and yellow. CIELAB was intended as a perceptually uniform space, where a given numerical change corresponds to a similar perceived change in color.">
               <template v-slot:activator="{ props }">
                 <v-btn color="blue" width="25" height="25" v-bind="props" icon>
                   <v-icon icon="mdi-help"></v-icon>
@@ -49,9 +50,10 @@
           <canvas class="mb-3" id="secondColorCanvas" width="20" height="20"></canvas>
           <p class="mb-3" id="secondColorCoord">X,Y: (0,0)</p>
           <p class="mb-3" id="secondColorRGB">RGB: (0,0,0)</p>
+          <p class="mb-3" id="secondColorContrast">Contrast: 0</p>
           <v-container class="d-flex flex-row pa-0 mb-3">
           <p class="mr-4" id="secondColorXYZ">XYZ: (0,0,0)</p>
-          <v-tooltip max-width="300" text="Define the relationship between the visible spectrum and the visual sensation of specific colors by human color vision. The CIE color spaces are mathematical models that create a 'standard observer', which attempts to predict the perception of unique hues of color. These color spaces are essential tools that provide the foundation for measuring color for industry, including inks, dyes, and paints, illumination, color imaging, etc.">
+          <v-tooltip max-width="300" text="In the CIE 1931 model, Y is the luminance, Z is quasi-equal to blue (of CIE RGB), and X is a mix of the three CIE RGB curves chosen to be nonnegative. Setting Y as luminance has the useful result that for any given Y value, the XZ plane will contain all possible chromaticities at that luminance.">
             <template v-slot:activator="{ props }">
               <v-btn color="blue" width="25" height="25" v-bind="props" icon>
                 <v-icon icon="mdi-help"></v-icon>
@@ -61,7 +63,7 @@
           </v-container>
           <v-container class="d-flex flex-row pa-0 mb-3">
           <p class="mr-4" id="secondColorLAB">LAB: (0,0,0)</p>
-            <v-tooltip max-width="300" text="The CIELAB color space, also referred to as L*a*b*, is a color space defined by the International Commission on Illumination (abbreviated CIE) in 1976. It expresses color as three values: L* for perceptual lightness and a* and b* for the four unique colors of human vision: red, green, blue and yellow. CIELAB was intended as a perceptually uniform space, where a given numerical change corresponds to a similar perceived change in color. While the LAB space is not truly perceptually uniform, it nevertheless is useful in industry for detecting small differences in color.">
+            <v-tooltip max-width="300" text="The CIELAB color space, also referred to as L*a*b*, is a color space defined by the International Commission on Illumination (abbreviated CIE) in 1976. It expresses color as three values: L* for perceptual lightness and a* and b* for the four unique colors of human vision: red, green, blue and yellow. CIELAB was intended as a perceptually uniform space, where a given numerical change corresponds to a similar perceived change in color.">
               <template v-slot:activator="{ props }">
                 <v-btn color="blue" width="25" height="25" v-bind="props" icon>
                   <v-icon icon="mdi-help"></v-icon>
@@ -192,39 +194,53 @@ export default{
               secondColorRGB.innerHTML = `RGB: (${r}, ${g}, ${b})` 
 
               let rNew = r/255.0; let gNew = g/255.0; let bNew = b/255.0;
-              if (rNew > 0.04045) r = Math.pow((rNew + 0.055) / 1.055, 2.4);
-              else rNew = rNew / 12.92;
-              if (gNew > 0.04045) gNew = Math.pow((gNew + 0.055) / 1.055, 2.4);
-              else gNew = gNew / 12.92;
-              if (bNew > 0.04045) bNew = Math.pow((bNew + 0.055) / 1.055, 2.4);
-              else bNew = bNew / 12.92;
-              rNew = 100*rNew; gNew = 100*gNew; bNew = 100*bNew;
 
-              var x = rNew*0.4124 + gNew*0.3576 + bNew*0.1805;
-              var y = rNew*0.2126 + gNew*0.7152 + bNew*0.0722;
-              var z = rNew*0.0193 + gNew*0.1192 + bNew*0.9505;
-              
+              const foregroundLum = this.measureLuminance(rNew, gNew, bNew)
+              const eyedropperCard = document.getElementById("eyedropperCard")
+              const rgbText = window.getComputedStyle(eyedropperCard).backgroundColor
+              const rgbArray = rgbText.match(/\b\d+\b/g)
+              const backgroundLum = this.measureLuminance(rgbArray[0]/255, rgbArray[1]/255, rgbArray[2]/255)
+              const secondColorContrast = document.getElementById("secondColorContrast")
+              let contrast = ((foregroundLum + 0.05) / (backgroundLum + 0.05)).toFixed(3)
+              secondColorContrast.innerHTML = "Contrast: " + contrast
               const secondColorXYZ = document.getElementById("secondColorXYZ")
-              secondColorXYZ.innerHTML = `XYZ: (${x.toFixed(3)}, ${y.toFixed(3)}, ${z.toFixed(3)})`              
-
-              x = x/95.047; y = y/100.000; z = z/108.883;
-              if ( x > 0.008856 ) x = Math.pow(x, 0.33);
-              else x = ( 7.787 * x ) + 0.1379;
-              if ( y > 0.008856 ) y = Math.pow(y, 0.33);
-              else y = ( 7.787 * y ) + 0.1379;
-              if ( z > 0.008856 ) z = Math.pow(z, 0.33);
-              else z = ( 7.787 * z ) + 0.1379;
-              var lLab = ( 116 * y ) - 16;
-              var aLab = 500 * ( x - y );
-              var bLab = 200 * ( y - z );
-
-              lLab = lLab/50.0 - 1.0 
-              aLab = aLab/100.0
-              bLab = bLab/100.0;
-
               const secondColorLAB = document.getElementById("secondColorLAB")
-              secondColorLAB.innerHTML = `LAB: (${lLab.toFixed(3)}, ${aLab.toFixed(3)}, ${bLab.toFixed(3)})`    
+              if(contrast < 4.5){
+                secondColorXYZ.innerHTML = "Contrast not enough"
+                secondColorLAB.innerHTML = "Contrast not enough"
+              }
+              else{
+                if (rNew > 0.04045) r = Math.pow((rNew + 0.055) / 1.055, 2.4);
+                else rNew = rNew / 12.92;
+                if (gNew > 0.04045) gNew = Math.pow((gNew + 0.055) / 1.055, 2.4);
+                else gNew = gNew / 12.92;
+                if (bNew > 0.04045) bNew = Math.pow((bNew + 0.055) / 1.055, 2.4);
+                else bNew = bNew / 12.92;
+                rNew = 100*rNew; gNew = 100*gNew; bNew = 100*bNew;
 
+                var x = rNew*0.4124 + gNew*0.3576 + bNew*0.1805;
+                var y = rNew*0.2126 + gNew*0.7152 + bNew*0.0722;
+                var z = rNew*0.0193 + gNew*0.1192 + bNew*0.9505;
+                
+                secondColorXYZ.innerHTML = `XYZ: (${x.toFixed(3)}, ${y.toFixed(3)}, ${z.toFixed(3)})`              
+
+                x = x/95.047; y = y/100.000; z = z/108.883;
+                if ( x > 0.008856 ) x = Math.pow(x, 0.33);
+                else x = ( 7.787 * x ) + 0.1379;
+                if ( y > 0.008856 ) y = Math.pow(y, 0.33);
+                else y = ( 7.787 * y ) + 0.1379;
+                if ( z > 0.008856 ) z = Math.pow(z, 0.33);
+                else z = ( 7.787 * z ) + 0.1379;
+                var lLab = ( 116 * y ) - 16;
+                var aLab = 500 * ( x - y );
+                var bLab = 200 * ( y - z );
+
+                lLab = lLab/50.0 - 1.0 
+                aLab = aLab/100.0
+                bLab = bLab/100.0;
+
+                secondColorLAB.innerHTML = `LAB: (${lLab.toFixed(3)}, ${aLab.toFixed(3)}, ${bLab.toFixed(3)})`    
+              }
             }
             else{
               const firstColorCanvas = document.getElementById("firstColorCanvas")
@@ -459,6 +475,16 @@ export default{
       this.canvas.removeEventListener("mousedown", this.handScrollerMouseDownHandler)
       this.canvas.removeEventListener("mousemove", this.handScrollerMouseMoveHandler)
       this.canvas.removeEventListener("mouseup", this.handScrollerMouseUpHandler)
+    },
+    measureLuminance(rNew, bNew, gNew){
+      if (rNew > 0.03928) rNew = Math.pow((rNew + 0.055) / 1.055, 2.4);
+      else rNew = rNew / 12.92;
+      if (gNew > 0.03928) gNew = Math.pow((gNew + 0.055) / 1.055, 2.4);
+      else gNew = gNew / 12.92;
+      if (bNew > 0.03928) bNew = Math.pow((bNew + 0.055) / 1.055, 2.4);
+      else bNew = bNew / 12.92;
+
+      return 0.2126 * rNew + 0.7152 * bNew + 0.0722 * gNew
     }
   }
 }
