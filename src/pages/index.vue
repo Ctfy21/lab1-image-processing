@@ -105,7 +105,10 @@
           <v-select label="Скорость скролла мышкой" v-model="mouseWheelSpeed" :items=mouseWheelSpeedSelect></v-select>
         </v-col>
         <v-col>
-          <Popup v-if="image != null" :imageToDialog="image" :imgSizeToDialog="imgSize.split('x')" @submitResolution="changeResolution"/>
+          <PopupResize v-if="image != null" :imageToDialog="image" :imgSizeToDialog="imgSize.split('x')" @submitResolution="changeResolution"/>
+        </v-col>
+        <v-col>
+          <PopupGradTrans v-if="image != null"/>
         </v-col>
         <v-col>
          <v-btn color="grey" @click="saveImage">SAVE</v-btn>
@@ -117,13 +120,15 @@
 
 <script>
 import Toolbar from '@/components/toolbar.vue';
-import Popup from '../components/popup.vue';
+import PopupResize from '../components/popupResize.vue';
+import PopupGradTrans from '@/components/popupGradTrans.vue'
+
 export default{
   props: {
     imgSizeToDialog: Array,
     imageToDialog: HTMLElement
   },
-  components: { Popup },
+  components: { PopupResize, Toolbar, PopupGradTrans },
   data() {
     return{
       image: null,
@@ -154,7 +159,11 @@ export default{
       rgbDarkestArray: [],
 
       mouseWheelSpeed: "100%",
-      mouseWheelSpeedSelect: ["25%", "50%", "100%", "150%", "200%", "300%"]
+      mouseWheelSpeedSelect: ["25%", "50%", "100%", "150%", "200%", "300%"],
+
+      rImageArray: [],
+      gImageArray: [],
+      bImageArray: [],
     }
   },
   mounted() {
@@ -542,6 +551,10 @@ export default{
           let r = imageData.data[index]
           let g = imageData.data[index + 1]
           let b = imageData.data[index + 2]
+
+          this.rImageArray.push(r)
+          this.gImageArray.push(g)
+          this.bImageArray.push(b)
 
           minR = Math.min(minR, r)
           minG = Math.min(minG, g)
