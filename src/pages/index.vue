@@ -121,7 +121,7 @@
 <script>
 import Toolbar from '@/components/toolbar.vue';
 import PopupResize from '../components/popupResize.vue';
-import PopupGradTrans from '@/components/popupGradTrans.vue'
+import PopupGradTrans from '../components/popupGradTrans.vue'
 
 export default{
   props: {
