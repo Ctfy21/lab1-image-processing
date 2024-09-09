@@ -108,7 +108,7 @@
           <PopupResize v-if="image != null" :imageToDialog="image" :imgSizeToDialog="imgSize.split('x')" @submitResolution="changeResolution"/>
         </v-col>
         <v-col>
-          <PopupGradTrans v-if="image != null"/>
+          <PopupGradTrans v-if="image != null" :rImageArray="rImageArray"/>
         </v-col>
         <v-col>
          <v-btn color="grey" @click="saveImage">SAVE</v-btn>
@@ -169,6 +169,10 @@ export default{
   mounted() {
     this.canvas = document.getElementById("imgCanvas")
     this.ctx = this.canvas.getContext('2d')
+
+    for (let i = 0; i <= 255; i++) {
+        this.rImageArray.push(0);
+    }
   },
   methods: {
     initMouseMoveAlg(){
@@ -552,9 +556,9 @@ export default{
           let g = imageData.data[index + 1]
           let b = imageData.data[index + 2]
 
-          this.rImageArray.push(r)
-          this.gImageArray.push(g)
-          this.bImageArray.push(b)
+          const tempCounter = this.rImageArray[r]
+          this.rImageArray[r] = tempCounter + 1
+
 
           minR = Math.min(minR, r)
           minG = Math.min(minG, g)

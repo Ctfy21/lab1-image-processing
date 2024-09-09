@@ -7,11 +7,9 @@
 // Plugins
 import vuetify from './vuetify'
 import router from '@/router'
-import chart from 'chart.js/auto'
 
 export function registerPlugins (app) {
   app
     .use(vuetify)
     .use(router)
-    // .use(chart)
 }
