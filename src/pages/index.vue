@@ -105,10 +105,10 @@
           <v-select label="Скорость скролла мышкой" v-model="mouseWheelSpeed" :items=mouseWheelSpeedSelect></v-select>
         </v-col>
         <v-col>
-          <PopupResize v-if="image != null" :imageToDialog="image" :imgSizeToDialog="imgSize.split('x')" @submitResolution="changeResolution"/>
+          <PopupResize v-if="loaded == true" :imageToDialog="image" :imgSizeToDialog="imgSize.split('x')" @submitResolution="changeResolution"/>
         </v-col>
         <v-col>
-          <PopupGradTrans v-if="image != null" :rImageArray="rImageArray"/>
+          <PopupGradTrans v-if="loaded == true" :rImageArray="rImageArray" :gImageArray="gImageArray" :bImageArray="bImageArray"/>
         </v-col>
         <v-col>
          <v-btn color="grey" @click="saveImage">SAVE</v-btn>
@@ -164,6 +164,8 @@ export default{
       rImageArray: [],
       gImageArray: [],
       bImageArray: [],
+
+      loaded: false
     }
   },
   mounted() {
@@ -173,6 +175,13 @@ export default{
     for (let i = 0; i <= 255; i++) {
         this.rImageArray.push(0);
     }
+    for (let i = 0; i <= 255; i++) {
+        this.gImageArray.push(0);
+    }
+    for (let i = 0; i <= 255; i++) {
+        this.bImageArray.push(0);
+    }
+
   },
   methods: {
     initMouseMoveAlg(){
@@ -360,6 +369,7 @@ export default{
         this.firstImgScaleSelect = scale
         this.rgbDarkestArray = this.getDarkestPixelOfImage()
         console.log(this.rgbDarkestArray)
+        this.loaded = true
       }
       this.image.src = src
     },
@@ -556,8 +566,12 @@ export default{
           let g = imageData.data[index + 1]
           let b = imageData.data[index + 2]
 
-          const tempCounter = this.rImageArray[r]
-          this.rImageArray[r] = tempCounter + 1
+          const tempCounterR = this.rImageArray[r]
+          this.rImageArray[r] = tempCounterR + 1
+          const tempCounterG = this.gImageArray[g]
+          this.gImageArray[g] = tempCounterG + 1
+          const tempCounterB = this.bImageArray[b]
+          this.bImageArray[b] = tempCounterB + 1
 
 
           minR = Math.min(minR, r)

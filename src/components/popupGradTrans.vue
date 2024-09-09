@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialogGrad">
+    <v-dialog maxWidth="1000" v-model="dialogGrad">
         <template v-slot:activator="{ props: activatorProps }">
             <v-btn
             v-bind="activatorProps"
@@ -12,7 +12,9 @@
         <template v-slot:default>
             <v-card title="Gamma correction">
                 <v-row justify="space-around" align="center">
-                    <BarChart v-if="loaded" :chartData="chartData" :chartOptions="chartOptions"/>
+                    <BarChart v-if="loaded" :chartData="chartDataRImage" :chartOptions="chartOptions"/>
+                    <BarChart v-if="loaded" :chartData="chartDataGImage" :chartOptions="chartOptions"/>
+                    <BarChart v-if="loaded" :chartData="chartDataBImage" :chartOptions="chartOptions"/>
                 </v-row>
                 <v-card-actions>
 
@@ -53,10 +55,15 @@ export default {
             this.imageLabels.push(i);
         }
         if(this.$props.rImageArray != 0){
-            this.chartData.labels = this.imageLabels.slice(1,-1)
-            this.chartData.datasets[0].data = this.$props.rImageArray.slice(1,-1)
+            this.chartDataRImage.labels = this.imageLabels.slice(1,-1)
+            this.chartDataRImage.datasets[0].data = this.$props.rImageArray.slice(1,-1)
+            this.chartDataGImage.labels = this.imageLabels.slice(1,-1)
+            this.chartDataGImage.datasets[0].data = this.$props.gImageArray.slice(1,-1)
+            this.chartDataBImage.labels = this.imageLabels.slice(1,-1)
+            this.chartDataBImage.datasets[0].data = this.$props.bImageArray.slice(1,-1)
             this.loaded = true
         }
+
     },
     data(){
         return{
@@ -65,14 +72,16 @@ export default {
             loaded: false,
             chartDataRImage: {
                 labels: [],
-                datasets: [ { 
+                datasets: [ {
+                    label: "R Histogram",
                     data: [],
                     backgroundColor: '#9BD0F5',
                     }]
             },
             chartDataGImage: {
                 labels: [],
-                datasets: [ { 
+                datasets: [ {
+                    label: "G Histogram",
                     data: [],
                     backgroundColor: '#9BD0F5',
                     }]
@@ -80,11 +89,15 @@ export default {
             chartDataBImage: {
                 labels: [],
                 datasets: [ { 
+                    label: "B Histogram", 
                     data: [],
                     backgroundColor: '#9BD0F5',
                     }]
             },
             chartOptions: {
+                layout: {
+                    padding: 50
+                },
                 plugins: {
                 title: {
                     display: true,

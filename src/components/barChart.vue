@@ -1,15 +1,17 @@
 <template>
     <Bar
-      id="my-chart-id"
+      ref="bar"
       :options="chartOptions"
       :data="chartData"
-    />
+    >
+  </Bar>
   </template>   
 
 <script>
 import { Bar } from 'vue-chartjs'
 
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import { nextTick } from 'vue';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -25,8 +27,9 @@ export default {
       default: () => {}
     }
   },
-//   mounted () {
-//     this.renderChart(this.chartData, this.options)
-//   }
+  mounted(e) {
+    nextTick()
+    console.log(this.$refs.bar)
+  }
 }
 </script>
