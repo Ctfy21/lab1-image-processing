@@ -13,8 +13,8 @@
             <v-card title="Gamma correction">
                 <v-row justify="space-around" align="center">
                     <BarChart v-if="loaded" :chartData="chartDataRImage" :chartOptions="chartOptions"/>
-                    <BarChart v-if="loaded" :chartData="chartDataGImage" :chartOptions="chartOptions"/>
-                    <BarChart v-if="loaded" :chartData="chartDataBImage" :chartOptions="chartOptions"/>
+                    <!-- <BarChart v-if="loaded" :chartData="chartDataGImage" :chartOptions="chartOptions"/>
+                    <BarChart v-if="loaded" :chartData="chartDataBImage" :chartOptions="chartOptions"/> -->
                 </v-row>
                 <v-card-actions>
 
