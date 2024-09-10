@@ -1,40 +1,49 @@
-<script setup>
-import Chart from 'chart.js/auto'
-</script>
-
 <template>
-  <canvas id="myChart"></canvas>
+  <Bar
+    ref="bar"
+    :options="chartOptions"
+    :data="chartData"
+  >
+</Bar>
 </template>   
 
 <script>
+import { Bar } from 'vue-chartjs'
+
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+
 export default {
-  props: {
-    chartData: {
-        type: Object,
-        required: true
-      },
-    chartOptions: {
+components: { Bar },
+props: {
+  chartData: {
       type: Object,
-      default: () => {}
-    }
-  },
-  mounted(){
-    const canvas = document.getElementById('myChart')
-    const myCh = new Chart(canvas, {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
+      required: true
     },
-    options: {}
-  });
-  const ctx = canvas.getContext("2d")
-  ctx.fillStyle = "red";
-  ctx.fillRect(0, 0, 1500, 1500);
+  chartOptions: {
+    type: Object,
+    default: () => {}
+  }
+},
+mounted(){
+  ChartJS.unregister(horizontalLinePlugin)
+  const horizontalLinePlugin = {
+            id: 'horizontalLine',
+            afterDraw: (chart) => {
+              console.log(chart)
+              const yValue = chart.scales.y.end
+              const { ctx } = chart
+              ctx.fillStyle = "red"
+              ctx.beginPath();
+              ctx.moveTo(chart.chartArea.left, yValue);
+              ctx.lineTo(chart.chartArea.right, yValue);
+              ctx.strokeStyle = 'red';
+              ctx.lineWidth = 2;
+              ctx.stroke();
+            }
+        };
+  ChartJS.register(horizontalLinePlugin)
 }
 }
 </script>
