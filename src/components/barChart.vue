@@ -31,6 +31,22 @@ props: {
 watch: { 
   gradiationValues:{ 
     handler: function(val, oldVal){
+      for (let i = 0; i < val.length; i++){
+        if(Number(val[i]) < 0){
+          val[i] = 0
+        }
+        if(Number(val[i]) > 255){
+          val[i] = 255
+        }
+      }
+
+      if(Number(val[2]) <= Number(val[0])){
+        val[2] = Number(val[0])
+      }
+      if(Number(val[3]) <= Number(val[1])){
+        val[3] = Number(val[1])
+      }
+
       const chartInstance = this.$refs.bar.chart
       chartInstance.update()
     },
@@ -42,7 +58,7 @@ data(){
     horizontalLinePlugin: {
             id: 'horizontalLine',
             afterDraw: (chart) => {
-              console.log(chart)
+              // console.log(chart) 
               const yValueMax = chart.scales.y.max
               const yValueMin = chart.scales.y.min
               const xValueMax = chart.scales.x.max
