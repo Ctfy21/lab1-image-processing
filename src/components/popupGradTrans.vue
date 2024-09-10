@@ -1,5 +1,5 @@
 <template>
-    <v-dialog maxWidth="1000" v-model="dialogGrad">
+    <v-dialog maxWidth="1500" v-model="dialogGrad">
         <template v-slot:activator="{ props: activatorProps }">
             <v-btn
             v-bind="activatorProps"
@@ -10,9 +10,19 @@
             ></v-btn>
         </template>
         <template v-slot:default>
-            <v-card title="Gamma correction">
+            <v-card title="Gamma correction" class="pa-7">
+                <v-row>
+                    <v-col>
+                        <v-text-field type="number" v-model="gradiationValues[0]" label="start X"></v-text-field>
+                        <v-text-field type="number" v-model="gradiationValues[1]" label="start Y"></v-text-field>
+                    </v-col>
+                    <v-col>
+                        <v-text-field type="number" v-model="gradiationValues[2]" label="end X"></v-text-field>
+                        <v-text-field type="number" v-model="gradiationValues[3]" label="end Y"></v-text-field>
+                    </v-col>
+                </v-row>
                 <v-row justify="space-around" align="center">
-                    <BarChart v-if="loaded" :chartData="chartDataRImage" :chartOptions="chartOptions"/>
+                    <BarChart v-if="loaded" :gradiationValues="gradiationValues" :chartData="chartDataRImage" :chartOptions="chartOptions"/>
                     <!-- <BarChart v-if="loaded" :chartData="chartDataGImage" :chartOptions="chartOptions"/>
                     <BarChart v-if="loaded" :chartData="chartDataBImage" :chartOptions="chartOptions"/> -->
                 </v-row>
@@ -69,6 +79,7 @@ export default {
         return{
             dialogGrad: null,
             imageLabels: [],
+            gradiationValues: ["0", "0", "255", "255"],
             loaded: false,
             chartDataRImage: {
                 labels: [],
