@@ -369,6 +369,7 @@ export default{
         this.firstImgScaleSelect = scale
         this.rgbDarkestArray = this.getDarkestPixelOfImage()
         console.log(this.rgbDarkestArray)
+        this.rescaleImage()
         this.loaded = true
       }
       this.image.src = src
