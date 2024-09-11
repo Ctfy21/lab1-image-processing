@@ -108,7 +108,7 @@
           <PopupResize v-if="loaded == true" :imageToDialog="image" :imgSizeToDialog="imgSize.split('x')" @submitResolution="changeResolution"/>
         </v-col>
         <v-col>
-          <PopupGradTrans v-if="loaded == true" :rImageArray="rImageArray" :gImageArray="gImageArray" :bImageArray="bImageArray"/>
+          <PopupGradTrans v-if="loaded == true" :rImageArray="rImageArray" :gImageArray="gImageArray" :bImageArray="bImageArray" @makeGradTransformation="performGradTransformation"/>
         </v-col>
         <v-col>
          <v-btn color="grey" @click="saveImage">SAVE</v-btn>
@@ -580,6 +580,58 @@ export default{
         }
       }
       return [minR, minG, minB]
+    },
+    performGradTransformation(gradiationValues){
+      let imageData = this.ctx.getImageData(0, 0, this.image.width, this.image.height)
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      for (let y = 0; y < imageData.height; y++) {
+        for (let x = 0; x < imageData.width; x++) {
+
+          const index = (y * imageData.width + x) * 4
+
+          if(imageData.data[index] <= gradiationValues[0]){
+            imageData.data[index] = gradiationValues[1]
+          }
+          else if(imageData.data[index] >= gradiationValues[2]){
+            imageData.data[index] = gradiationValues[3]
+          }
+          else{
+            const xTemp = gradiationValues[2] - gradiationValues[0]
+            const yTemp = gradiationValues[3] - gradiationValues[1]
+            imageData.data[index] = gradiationValues[1] + Math.round(yTemp * ((imageData.data[index] - gradiationValues[0]) / xTemp))
+          }
+
+
+          if(imageData.data[index + 1] <= gradiationValues[0]){
+            imageData.data[index + 1] = gradiationValues[1]
+          }
+          else if(imageData.data[index + 1] >= gradiationValues[2]){
+            imageData.data[index + 1] = gradiationValues[3]
+          }
+          else{
+            const xTemp = gradiationValues[2] - gradiationValues[0]
+            const yTemp = gradiationValues[3] - gradiationValues[1]
+            imageData.data[index + 1] = gradiationValues[1] + Math.round(yTemp * ((imageData.data[index + 1] - gradiationValues[0]) / xTemp))
+          }
+
+
+          if(imageData.data[index + 2] <= gradiationValues[0]){
+            imageData.data[index + 2] = gradiationValues[1]
+          }
+          else if(imageData.data[index + 2] >= gradiationValues[2]){
+            imageData.data[index + 2] = gradiationValues[3]
+          }
+          else{
+            const xTemp = gradiationValues[2] - gradiationValues[0]
+            const yTemp = gradiationValues[3] - gradiationValues[1]
+            imageData.data[index + 2] = gradiationValues[1] + Math.round(yTemp * ((imageData.data[index + 2] - gradiationValues[0]) / xTemp))
+          }
+        }
+      }
+
+      this.ctx.putImageData(imageData, 0, 0)
+      this.initial(this.canvas.toDataURL())
+
     }
   }
 }

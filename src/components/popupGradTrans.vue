@@ -1,10 +1,10 @@
 <template>
-    <v-dialog maxWidth="1500" v-model="dialogGrad">
+    <v-dialog maxWidth="1000" v-model="dialogGrad">
         <template v-slot:activator="{ props: activatorProps }">
             <v-btn
             v-bind="activatorProps"
             color="green"
-            text="Gamma correction"
+            text="Gradiation correction"
             variant="flat"
             @click="dialogGrad = true"
             ></v-btn>
@@ -21,10 +21,13 @@
                         <v-text-field type="number" v-model="gradiationValues[3]" label="end Y"></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row justify="center" align="center">
+                    <v-btn color="blue-darken-4" @click="makeGradTransformation">Transform</v-btn>
+                </v-row>
                 <v-row justify="space-around" align="center">
                     <BarChart v-if="loaded" :gradiationValues="gradiationValues" :chartData="chartDataRImage" :chartOptions="chartOptions"/>
-                    <!-- <BarChart v-if="loaded" :chartData="chartDataGImage" :chartOptions="chartOptions"/>
-                    <BarChart v-if="loaded" :chartData="chartDataBImage" :chartOptions="chartOptions"/> -->
+                    <BarChart v-if="loaded" :gradiationValues="gradiationValues" :chartData="chartDataGImage" :chartOptions="chartOptions"/>
+                    <BarChart v-if="loaded" :gradiationValues="gradiationValues" :chartData="chartDataBImage" :chartOptions="chartOptions"/>
                 </v-row>
                 <v-card-actions>
 
@@ -119,11 +122,11 @@ export default {
             }
             }
     },
-    // methods:{
-    //     loggin(){
-    //         console.log(this.imageLabels.slice(0,3))
-    //         console.log(this.$props.rImageArray.slice(0,3))
-    //     }
-    // }
+    methods:{
+        makeGradTransformation(){
+            this.$emit('makeGradTransformation', this.gradiationValues)
+            this.dialogGrad = false
+        }
+    }
 }
 </script>
