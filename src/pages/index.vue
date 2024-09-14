@@ -111,6 +111,9 @@
           <PopupGradTrans v-if="loaded == true" :rImageArray="rImageArray" :gImageArray="gImageArray" :bImageArray="bImageArray" @makeGradTransformation="performGradTransformation"/>
         </v-col>
         <v-col>
+          <PopupFilterImage v-if="loaded == true"/>
+        </v-col>
+        <v-col>
          <v-btn color="grey" @click="saveImage">SAVE</v-btn>
         </v-col>
     </v-col>
@@ -122,13 +125,14 @@
 import Toolbar from '@/components/toolbar.vue';
 import PopupResize from '../components/popupResize.vue';
 import PopupGradTrans from '../components/popupGradTrans.vue'
+import PopupFilterImage from '../components/popupFilterImage.vue'
 
 export default{
   props: {
     imgSizeToDialog: Array,
     imageToDialog: HTMLElement
   },
-  components: { PopupResize, Toolbar, PopupGradTrans },
+  components: { PopupResize, Toolbar, PopupGradTrans, PopupFilterImage},
   data() {
     return{
       image: null,
