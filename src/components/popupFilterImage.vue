@@ -4,17 +4,28 @@
             <v-btn
             v-bind="activatorProps"
             color="green"
-            text="Gradiation correction"
+            text="Filter correction"
             variant="flat"
-            @click="dialogGrad = true"
+            @click="dialogFilter = true"
             ></v-btn>
         </template>
         <template v-slot:default="{ isActive }">
-            <v-card title="Gamma correction">
-                <v-card-item>
-                    <GridFilter></GridFilter>
+            <v-card title="Filter correction">
+                <v-card-item align="center" justify="center">
+                
+                <GridFilter></GridFilter>
+
+                <v-row class="mt-10">
+                    <v-select label="Type of filter alghorotm" :items="filterAlgList" :v-model="filterAlg" item-title="title"/>
+                </v-row>
                 </v-card-item>
                 <v-card-actions>
+
+                <v-btn
+                    text="Reset"
+                    color="blue"
+                    @click="dialogFilter = false"
+                ></v-btn>
 
                 <v-btn
                     text="Close"
@@ -42,7 +53,26 @@ export default {
     },
     data(){
         return{
-            dialogFilter: false
+            dialogFilter: false,
+            filterAlgList: [
+                {
+                    title: 'Base variant',
+                    values: []
+                },
+                {
+                    title: 'Increase sharpness',
+                    values: []
+                },
+                {
+                    title: 'Gaussian filter',
+                    values: []
+                },
+                {
+                    title: 'Rectangle filter',
+                    values: []
+                }
+            ],
+            filterAlg: null
         } 
     },
 }
