@@ -127,8 +127,14 @@ export default{
         },
         propMeasure(){
             if(this.isProportional == true){
-                this.measureScale()
-                this.imgHeight = Math.round(this.imgWidth * this.scale)
+                if(this.imgWidth > this.imgHeight){
+                    this.measureScale()
+                    this.imgHeight = Math.round(this.imgWidth * this.scale)
+                }
+                else{
+                    this.measureScale()
+                    this.imgWidth = Math.round(this.imgHeight * this.scale)
+                }
             }
         },
         percentsEventActivator(){

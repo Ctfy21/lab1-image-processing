@@ -1,19 +1,19 @@
 <template>
-<!-- <div class="otp" id="otp">
-    <input v-model="filterAlg.values[0]" type="text" class="otp__input" maxlength="2" />
-    <input v-model="filterAlg.values[1]" type="text" class="otp__input" maxlength="2" />
-    <input v-model="filterAlg.values[2]" type="text" class="otp__input" maxlength="2" />
+<div class="otp" id="otp">
+    <input v-model="filterAlg[0]" type="text" class="otp__input" maxlength="2" />
+    <input v-model="filterAlg[1]" type="text" class="otp__input" maxlength="2" />
+    <input v-model="filterAlg[2]" type="text" class="otp__input" maxlength="2" />
 </div>
 <div class="otp" id="otp">
-    <input v-model="filterAlg.values[3]" type="text" class="otp__input" maxlength="2" />
-    <input v-model="filterAlg.values[4]" type="text" class="otp__input" maxlength="2" />
-    <input v-model="filterAlg.values[5]" type="text" class="otp__input" maxlength="2" />
+    <input v-model="filterAlg[3]" type="text" class="otp__input" maxlength="2" />
+    <input v-model="filterAlg[4]" type="text" class="otp__input" maxlength="2" />
+    <input v-model="filterAlg[5]" type="text" class="otp__input" maxlength="2" />
 </div>
 <div class="otp" id="otp">
-    <input v-model="filterAlg.values[6]" type="text" class="otp__input" maxlength="2" />
-    <input v-model="filterAlg.values[7]" type="text" class="otp__input" maxlength="2" />
-    <input v-model="filterAlg.values[8]" type="text" class="otp__input" maxlength="2" />
-</div> -->
+    <input v-model="filterAlg[6]" type="text" class="otp__input" maxlength="2" />
+    <input v-model="filterAlg[7]" type="text" class="otp__input" maxlength="2" />
+    <input v-model="filterAlg[8]" type="text" class="otp__input" maxlength="2" />
+</div>
 </template>   
 
 <style lang="css">

@@ -111,7 +111,7 @@
           <PopupGradTrans v-if="loaded == true" :rImageArray="rImageArray" :gImageArray="gImageArray" :bImageArray="bImageArray" @makeGradTransformation="performGradTransformation"/>
         </v-col>
         <v-col>
-          <PopupFilterImage v-if="loaded == true"/>
+          <PopupFilterImage v-if="loaded == true" @startFilterImage="startFilterImage"/>
         </v-col>
         <v-col>
          <v-btn color="grey" @click="saveImage">SAVE</v-btn>
@@ -637,6 +637,168 @@ export default{
       this.ctx.putImageData(imageData, 0, 0)
       this.initial(this.canvas.toDataURL())
 
+    },
+    startFilterImage(filterAlgArray){
+      if(filterAlgArray.length == 0){
+          const width = this.image.width
+          const height = this.image.height
+
+          console.log(width, height)
+
+          const canvas = document.createElement("canvas")
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext("2d")
+          ctx.clearRect(0, 0, width, height); // Очистка холста
+          ctx.drawImage(this.image, 0, 0, width, height);
+          let imageData = ctx.getImageData(0, 0, width, height)
+          let newImageData = ctx.createImageData(width, height)
+
+          const kernelSize = 3
+          const kernelHalf = Math.floor(kernelSize / 2)
+
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+
+              const arrRed = []
+              const arrGreen = []
+              const arrBlue = []
+              let a = 0;
+
+              let indexMain = (y * width + x) * 4
+
+              for (let ky = 0; ky < kernelSize; ky++){
+                for (let kx = 0; kx < kernelSize; kx++){
+
+
+                    let pixelX = x - kernelHalf + kx
+                    let pixelY = y - kernelHalf + ky
+
+                    if(pixelX < 0){
+                      pixelX = -pixelX
+                    }
+                    else if (pixelX >= width){
+                      pixelX = width - (pixelX - width) - 1
+                    }
+
+                    if(pixelY < 0){
+                      pixelY = -pixelY
+                    }
+                    else if (pixelY >= height){
+                      pixelY = height - (pixelY - height) - 1
+                    }
+
+                    let index = (pixelY * width + pixelX) * 4
+
+                    let r = imageData.data[index]
+                    let g = imageData.data[index + 1]
+                    let b = imageData.data[index + 2]
+
+                    arrRed.push(r)
+                    arrGreen.push(g)
+                    arrBlue.push(b)
+                } 
+              }
+
+              arrRed.sort(this.compareNumbers)
+              arrGreen.sort(this.compareNumbers)
+              arrBlue.sort(this.compareNumbers)
+
+              newImageData.data[indexMain] = arrRed[Math.ceil(arrRed.length / 2)]
+              newImageData.data[indexMain + 1] = arrGreen[Math.ceil(arrGreen.length / 2)]
+              newImageData.data[indexMain + 2] = arrBlue[Math.ceil(arrBlue.length / 2)]
+              newImageData.data[indexMain + 3] = imageData.data[indexMain + 3]
+
+            }
+          }
+
+          ctx.putImageData(newImageData, 0, 0)
+          this.initial(canvas.toDataURL())
+
+        }
+        else {
+        const width = this.image.width
+        const height = this.image.height
+
+        console.log(width, height)
+
+        const canvas = document.createElement("canvas")
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext("2d")
+        ctx.clearRect(0, 0, width, height); // Очистка холста
+        ctx.drawImage(this.image, 0, 0, width, height);
+        let imageData = ctx.getImageData(0, 0, width, height)
+        let newImageData = ctx.createImageData(width, height)
+
+        const kernelSize = filterAlgArray.length
+        const kernelHalf = Math.floor(kernelSize / 2)
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+
+            let sumR = 0;
+            let sumG = 0;
+            let sumB = 0;
+
+            let a = 0;
+
+            let indexMain = (y * width + x) * 4
+
+            for (let ky = 0; ky < kernelSize; ky++){
+              for (let kx = 0; kx < kernelSize; kx++){
+
+
+                  let pixelX = x - kernelHalf + kx
+                  let pixelY = y - kernelHalf + ky
+
+                  if(pixelX < 0){
+                    pixelX = -pixelX
+                  }
+                  else if (pixelX >= width){
+                    pixelX = width - (pixelX - width) - 1
+                  }
+
+                  if(pixelY < 0){
+                    pixelY = -pixelY
+                  }
+                  else if (pixelY >= height){
+                    pixelY = height - (pixelY - height) - 1
+                  }
+
+                  let index = (pixelY * width + pixelX) * 4
+
+                  let r = imageData.data[index]
+                  let g = imageData.data[index + 1]
+                  let b = imageData.data[index + 2]
+
+                  sumR += r * filterAlgArray[ky][kx]
+                  sumG += g * filterAlgArray[ky][kx]
+                  sumB += b * filterAlgArray[ky][kx]
+              } 
+          }
+
+          let newRed = Math.round(Math.min(Math.max(sumR, 0), 255))
+          let newGreen = Math.round(Math.min(Math.max(sumG, 0), 255))
+          let newBlue = Math.round(Math.min(Math.max(sumB, 0), 255))
+
+          // console.log(newRed, newGreen, newBlue )
+
+          newImageData.data[indexMain] = newRed
+          newImageData.data[indexMain + 1] = newGreen
+          newImageData.data[indexMain + 2] = newBlue
+          newImageData.data[indexMain + 3] = imageData.data[indexMain + 3]
+
+        }
+      }
+
+      ctx.putImageData(newImageData, 0, 0)
+      this.initial(canvas.toDataURL())
+
+      }
+    },
+    compareNumbers(a, b) {
+      return a - b;
     }
   }
 }
