@@ -1,6 +1,6 @@
 <template>
   <v-app-bar elevation="1">
-    <v-app-bar-title>lab1-image-processing</v-app-bar-title>
+    <v-app-bar-title>image-processing</v-app-bar-title>
   </v-app-bar>
 
 
