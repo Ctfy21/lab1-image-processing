@@ -24,8 +24,8 @@
             </v-row>
             <v-container class="mx-0 px-0" v-if="scaleFactor == 0">
                 <v-row class="pl-5 pr-5">
-                    <v-col><v-text-field id="imgWidthId" v-model="imgWidth" @input="propMeasure" label="Width in pixels"></v-text-field></v-col>
-                    <v-col><v-text-field v-model="imgHeight" label="Height in pixels" :disabled="isProportional"></v-text-field></v-col>
+                    <v-col><v-text-field type="number" id="imgWidthId" v-model="imgWidth" @input="propMeasure" label="Width in pixels"></v-text-field></v-col>
+                    <v-col><v-text-field type="number" v-model="imgHeight" label="Height in pixels" :disabled="isProportional"></v-text-field></v-col>
                 </v-row>
                 <v-row class="pl-5 pr-5 mt-0">
                     <v-checkbox label="Make proportional" v-model="isProportional"></v-checkbox>
@@ -33,8 +33,8 @@
             </v-container>
             <v-container class="mx-0 px-0" v-if="scaleFactor == 1">
                 <v-row class="pl-5 pr-5">
-                    <v-col><v-text-field id="imgWidthId" v-model="imgWidthPercents" @input="percentsEventActivator" label="Width in %"></v-text-field></v-col>
-                    <v-col><v-text-field v-model="imgHeightPercents" label="Height in %" @input="percentsToPixels" :disabled="isProportional"></v-text-field></v-col>
+                    <v-col><v-text-field type="number" id="imgWidthId" v-model="imgWidthPercents" @input="percentsEventActivator" label="Width in %"></v-text-field></v-col>
+                    <v-col><v-text-field type="number" v-model="imgHeightPercents" label="Height in %" @input="percentsToPixels" :disabled="isProportional"></v-text-field></v-col>
                 </v-row>
                 <v-row class="pl-5 pr-5 mt-0">
                     <v-checkbox label="Make proportional" v-model="isProportional"></v-checkbox>

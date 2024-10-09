@@ -158,6 +158,7 @@ export default{
       tempY: null,
       dx: 0,
       dy: 0,
+      isShift: false,
 
       eyeDropperShow: false,
       rgbDarkestArray: [],
@@ -382,6 +383,7 @@ export default{
       this.initial(URL.createObjectURL(e.target.files[0]))
       this.initMouseMoveAlg()
       this.canvas.addEventListener("wheel", this.handScrollerMouseWheelHandler)
+      this.canvas.addEventListener("wheel", this.handScrollerMouseWheelHandler)
     },
     submitImgUrl() {
       this.initial(this.imgUrl)
@@ -487,17 +489,42 @@ export default{
     handScrollerMouseWheelHandler(e){
       e.preventDefault();
       let scale = Number(this.imgScaleSelect.substring(0, this.imgScaleSelect.length - 1)) / 100
-          if(scale > this.firstImgScaleSelect){
-            this.dy = Math.floor(e.deltaY * 0.01 * scale * Number(this.mouseWheelSpeed.substring(0, this.mouseWheelSpeed.length - 1)) / 100)
+            if(scale > this.firstImgScaleSelect){
+              this.dx = Math.floor(e.deltaX * 0.01 * scale * Number(this.mouseWheelSpeed.substring(0, this.mouseWheelSpeed.length - 1)) / 100)
 
-            this.tempY = Math.min(this.imgStartY - this.dy, 0)
-            this.tempY = Math.floor(Math.max(this.tempY, -this.image.height * scale + this.canvas.height))
+              this.tempX = Math.min(this.imgStartX - this.dx, 0)
+              this.tempX = Math.floor(Math.max(this.tempX, -this.image.width * scale + this.canvas.width))
 
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.drawImage(this.image, this.imgStartX, this.tempY, this.image.width * scale, this.image.height * scale);
+              this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+              this.ctx.drawImage(this.image, this.tempX, this.imgStartY, this.image.width * scale, this.image.height * scale);
 
-            this.imgStartY = this.tempY
-          }
+              this.imgStartX = this.tempX
+            }
+
+            if(scale > this.firstImgScaleSelect){
+              if(e.shiftKey){
+                this.dx = Math.floor(e.deltaY * 0.01 * scale * Number(this.mouseWheelSpeed.substring(0, this.mouseWheelSpeed.length - 1)) / 100)
+
+                this.tempX = Math.min(this.imgStartX - this.dx, 0)
+                this.tempX = Math.floor(Math.max(this.tempX, -this.image.width * scale + this.canvas.width))
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.drawImage(this.image, this.tempX, this.imgStartY, this.image.width * scale, this.image.height * scale);
+
+                this.imgStartX = this.tempX
+              }
+              else{
+                this.dy = Math.floor(e.deltaY * 0.01 * scale * Number(this.mouseWheelSpeed.substring(0, this.mouseWheelSpeed.length - 1)) / 100)
+
+                this.tempY = Math.min(this.imgStartY - this.dy, 0)
+                this.tempY = Math.floor(Math.max(this.tempY, -this.image.height * scale + this.canvas.height))
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.drawImage(this.image, this.imgStartX, this.tempY, this.image.width * scale, this.image.height * scale);
+
+                this.imgStartY = this.tempY
+              }
+            }
     },
     handScrollerMouseDownHandler(e){
         this.isMouseDown = true
@@ -636,7 +663,7 @@ export default{
 
       this.ctx.putImageData(imageData, 0, 0)
       this.initial(this.canvas.toDataURL())
-
+npd
     },
     startFilterImage(filterAlgArray){
       if(filterAlgArray.length == 0){
