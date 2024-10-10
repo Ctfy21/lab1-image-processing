@@ -3,8 +3,7 @@
     ref="bar"
     :options="chartOptions"
     :data="chartData"
-  >
-</Bar>
+  />
 </template>   
 
 <script>

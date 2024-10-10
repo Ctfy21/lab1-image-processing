@@ -25,6 +25,7 @@
                     <v-btn color="blue-darken-4" @click="makeGradTransformation">Transform</v-btn>
                 </v-row>
                 <v-row justify="space-around" align="center">
+                    <p class="text-h6 pt-13 pb-5">RGB Hystogram</p>
                     <BarChart v-if="loaded" :gradiationValues="gradiationValues" :chartData="chartDataRImage" :chartOptions="chartOptions"/>
                     <BarChart v-if="loaded" :gradiationValues="gradiationValues" :chartData="chartDataGImage" :chartOptions="chartOptions"/>
                     <BarChart v-if="loaded" :gradiationValues="gradiationValues" :chartData="chartDataBImage" :chartOptions="chartOptions"/>
@@ -35,13 +36,7 @@
                     text="Close"
                     color="red"
                     @click="dialogGrad = false"
-                ></v-btn>
-
-                <v-btn
-                    ref="confirmCorrection"
-                    text="Confirm"
-                    color="green"
-                ></v-btn>
+                ></v-btn>   
             </v-card-actions>
             </v-card>
         </template>
@@ -110,13 +105,17 @@ export default {
             },
             chartOptions: {
                 layout: {
-                    padding: 50
+                    padding: {
+                        bottom: 50,
+                        left: 220,
+                        right: 220
+                    }
                 },
                 plugins: {
-                title: {
-                    display: true,
-                    text: 'RGB Histogram'
-                }
+                // title: {
+                //     display: true,
+                //     text: 'RGB Histogram'
+                // }
             },
                 responsive: true
             }
